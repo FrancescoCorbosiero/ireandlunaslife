@@ -1,0 +1,8 @@
+{
+  "name": "legacy-scrape",
+  "private": true,
+  "type": "module",
+  "description": "Archivia il sito WordPress ireandlunaslife.it (copy, media, screenshot, stile) in /legacy",
+  "scripts": { "scrape": "node scrape.mjs" },
+  "dependencies": { "cheerio": "^1.0.0", "turndown": "^7.2.0" }
+}

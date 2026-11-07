@@ -1,0 +1,492 @@
+{
+  "library": [
+    {
+      "id": 749,
+      "file": "library/luna-9-1.jpg",
+      "title": "luna-9",
+      "alt": "",
+      "caption": "",
+      "mime": "image/jpeg",
+      "width": 5120,
+      "height": 3413,
+      "date": "2025-04-08T03:41:59",
+      "downloaded": true,
+      "usedIn": [
+        "ireandlunaslife-blog"
+      ]
+    },
+    {
+      "id": 727,
+      "file": "library/background-cool.jpg",
+      "title": "background-cool",
+      "alt": "",
+      "caption": "",
+      "mime": "image/jpeg",
+      "width": 3500,
+      "height": 2100,
+      "date": "2025-04-07T03:18:27",
+      "downloaded": true,
+      "usedIn": []
+    },
+    {
+      "id": 688,
+      "file": "library/luna-10jpg-.jpeg",
+      "title": "luna-10jpg-",
+      "alt": "",
+      "caption": "",
+      "mime": "image/jpeg",
+      "width": 5120,
+      "height": 3413,
+      "date": "2025-04-06T20:45:07",
+      "downloaded": true,
+      "usedIn": [
+        "chi-sono",
+        "blog",
+        "ireandlunaslife-blog"
+      ]
+    },
+    {
+      "id": 593,
+      "file": "library/logo-white-1.png",
+      "title": "logo-white",
+      "alt": "",
+      "caption": "",
+      "mime": "image/png",
+      "width": 341,
+      "height": 128,
+      "date": "2025-04-05T19:05:27",
+      "downloaded": true,
+      "usedIn": [
+        "contatti",
+        "consulenze",
+        "chi-sono",
+        "home"
+      ]
+    },
+    {
+      "id": 342,
+      "file": "library/luna-9.jpg",
+      "title": "luna-9",
+      "alt": "",
+      "caption": "",
+      "mime": "image/jpeg",
+      "width": 5120,
+      "height": 3413,
+      "date": "2025-04-04T20:31:21",
+      "downloaded": true,
+      "usedIn": []
+    },
+    {
+      "id": 341,
+      "file": "library/luna-8.jpg",
+      "title": "luna-8",
+      "alt": "",
+      "caption": "",
+      "mime": "image/jpeg",
+      "width": 5120,
+      "height": 3413,
+      "date": "2025-04-04T20:31:21",
+      "downloaded": true,
+      "usedIn": [
+        "consulenze",
+        "home"
+      ]
+    },
+    {
+      "id": 340,
+      "file": "library/luna-7.jpg",
+      "title": "luna-7",
+      "alt": "",
+      "caption": "",
+      "mime": "image/jpeg",
+      "width": 3024,
+      "height": 4032,
+      "date": "2025-04-04T20:31:21",
+      "downloaded": true,
+      "usedIn": []
+    },
+    {
+      "id": 339,
+      "file": "library/luna-6.jpg",
+      "title": "luna-6",
+      "alt": "",
+      "caption": "",
+      "mime": "image/jpeg",
+      "width": 3413,
+      "height": 5120,
+      "date": "2025-04-04T20:31:21",
+      "downloaded": true,
+      "usedIn": []
+    },
+    {
+      "id": 338,
+      "file": "library/luna-5.jpg",
+      "title": "luna-5",
+      "alt": "",
+      "caption": "",
+      "mime": "image/jpeg",
+      "width": 3413,
+      "height": 5120,
+      "date": "2025-04-04T20:31:21",
+      "downloaded": true,
+      "usedIn": [
+        "ireandlunaslife-blog"
+      ]
+    },
+    {
+      "id": 337,
+      "file": "library/irene-5.jpg",
+      "title": "irene-5",
+      "alt": "",
+      "caption": "",
+      "mime": "image/jpeg",
+      "width": 3024,
+      "height": 4032,
+      "date": "2025-04-04T20:31:20",
+      "downloaded": true,
+      "usedIn": [
+        "home"
+      ]
+    },
+    {
+      "id": 329,
+      "file": "library/background-blueish.jpg",
+      "title": "background-blueish",
+      "alt": "",
+      "caption": "",
+      "mime": "image/jpeg",
+      "width": 5760,
+      "height": 3240,
+      "date": "2025-04-04T19:39:41",
+      "downloaded": true,
+      "usedIn": []
+    },
+    {
+      "id": 48,
+      "file": "library/collage-1.png",
+      "title": "collage",
+      "alt": "",
+      "caption": "",
+      "mime": "image/png",
+      "width": 854,
+      "height": 729,
+      "date": "2025-04-03T18:56:22",
+      "downloaded": true,
+      "usedIn": [
+        "home"
+      ]
+    },
+    {
+      "id": 30,
+      "file": "library/android-chrome-512x512-1.png",
+      "title": "android-chrome-512×512",
+      "alt": "",
+      "caption": "",
+      "mime": "image/png",
+      "width": 512,
+      "height": 512,
+      "date": "2025-04-03T18:15:25",
+      "downloaded": true,
+      "usedIn": []
+    },
+    {
+      "id": 29,
+      "file": "library/android-chrome-192x192-1.png",
+      "title": "android-chrome-192×192",
+      "alt": "",
+      "caption": "",
+      "mime": "image/png",
+      "width": 192,
+      "height": 192,
+      "date": "2025-04-03T18:14:51",
+      "downloaded": true,
+      "usedIn": []
+    },
+    {
+      "id": 26,
+      "file": "library/team-branco.png",
+      "title": "team-branco",
+      "alt": "Logo Team Branco",
+      "caption": "Logo Team Branco",
+      "mime": "image/png",
+      "width": 1680,
+      "height": 945,
+      "date": "2025-04-03T18:10:24",
+      "downloaded": true,
+      "usedIn": [
+        "contatti",
+        "home"
+      ]
+    },
+    {
+      "id": 25,
+      "file": "library/reico-padding.png",
+      "title": "reico-padding",
+      "alt": "Prodotti Reico Vital Systeme",
+      "caption": "Reico Vital Systeme Prodotti",
+      "mime": "image/png",
+      "width": 3094,
+      "height": 2898,
+      "date": "2025-04-03T18:10:24",
+      "downloaded": true,
+      "usedIn": []
+    },
+    {
+      "id": 24,
+      "file": "library/Reico.png",
+      "title": "Reico",
+      "alt": "Prodotti Reico Vital Systeme",
+      "caption": "Prodotti Reico Vital Systeme",
+      "mime": "image/png",
+      "width": 2277,
+      "height": 2132,
+      "date": "2025-04-03T18:10:24",
+      "downloaded": true,
+      "usedIn": []
+    },
+    {
+      "id": 23,
+      "file": "library/paw-black.png",
+      "title": "paw-black",
+      "alt": "",
+      "caption": "",
+      "mime": "image/png",
+      "width": 512,
+      "height": 512,
+      "date": "2025-04-03T18:10:23",
+      "downloaded": true,
+      "usedIn": []
+    },
+    {
+      "id": 22,
+      "file": "library/luna-4.jpg",
+      "title": "luna-4",
+      "alt": "",
+      "caption": "",
+      "mime": "image/jpeg",
+      "width": 1440,
+      "height": 961,
+      "date": "2025-04-03T18:10:23",
+      "downloaded": true,
+      "usedIn": []
+    },
+    {
+      "id": 21,
+      "file": "library/luna-3.jpg",
+      "title": "luna-3",
+      "alt": "",
+      "caption": "",
+      "mime": "image/jpeg",
+      "width": 1440,
+      "height": 1800,
+      "date": "2025-04-03T18:10:23",
+      "downloaded": true,
+      "usedIn": []
+    },
+    {
+      "id": 20,
+      "file": "library/luna-2.jpg",
+      "title": "luna-2",
+      "alt": "",
+      "caption": "",
+      "mime": "image/jpeg",
+      "width": 1440,
+      "height": 1796,
+      "date": "2025-04-03T18:10:23",
+      "downloaded": true,
+      "usedIn": []
+    },
+    {
+      "id": 19,
+      "file": "library/luna.jpg",
+      "title": "luna",
+      "alt": "",
+      "caption": "",
+      "mime": "image/jpeg",
+      "width": 1440,
+      "height": 1799,
+      "date": "2025-04-03T18:10:22",
+      "downloaded": true,
+      "usedIn": []
+    },
+    {
+      "id": 18,
+      "file": "library/logo-white.png",
+      "title": "logo-white",
+      "alt": "",
+      "caption": "",
+      "mime": "image/png",
+      "width": 341,
+      "height": 128,
+      "date": "2025-04-03T18:10:22",
+      "downloaded": true,
+      "usedIn": [
+        "blog"
+      ]
+    },
+    {
+      "id": 17,
+      "file": "library/logo-2.png",
+      "title": "logo-2",
+      "alt": "",
+      "caption": "",
+      "mime": "image/png",
+      "width": 981,
+      "height": 369,
+      "date": "2025-04-03T18:10:22",
+      "downloaded": true,
+      "usedIn": []
+    },
+    {
+      "id": 16,
+      "file": "library/logo.png",
+      "title": "logo",
+      "alt": "",
+      "caption": "",
+      "mime": "image/png",
+      "width": 214,
+      "height": 100,
+      "date": "2025-04-03T18:10:22",
+      "downloaded": true,
+      "usedIn": [
+        "contatti",
+        "consulenze",
+        "chi-sono",
+        "blog",
+        "home",
+        "ireandlunaslife-blog"
+      ]
+    },
+    {
+      "id": 15,
+      "file": "library/irene-4.jpg",
+      "title": "irene-4",
+      "alt": "",
+      "caption": "",
+      "mime": "image/jpeg",
+      "width": 1440,
+      "height": 1302,
+      "date": "2025-04-03T18:10:22",
+      "downloaded": true,
+      "usedIn": [
+        "chi-sono",
+        "home"
+      ]
+    },
+    {
+      "id": 14,
+      "file": "library/irene-3.jpg",
+      "title": "irene-3",
+      "alt": "",
+      "caption": "",
+      "mime": "image/jpeg",
+      "width": 1440,
+      "height": 1440,
+      "date": "2025-04-03T18:10:21",
+      "downloaded": true,
+      "usedIn": [
+        "ireandlunaslife-blog"
+      ]
+    },
+    {
+      "id": 13,
+      "file": "library/irene-2.jpg",
+      "title": "irene-2",
+      "alt": "Logo del sito - Ire and Luna's Life",
+      "caption": "",
+      "mime": "image/jpeg",
+      "width": 1024,
+      "height": 1024,
+      "date": "2025-04-03T18:10:21",
+      "downloaded": true,
+      "usedIn": []
+    },
+    {
+      "id": 12,
+      "file": "library/irene.jpg",
+      "title": "irene",
+      "alt": "",
+      "caption": "",
+      "mime": "image/jpeg",
+      "width": 1170,
+      "height": 1462,
+      "date": "2025-04-03T18:10:21",
+      "downloaded": true,
+      "usedIn": []
+    },
+    {
+      "id": 11,
+      "file": "library/hero.jpg",
+      "title": "hero",
+      "alt": "",
+      "caption": "",
+      "mime": "image/jpeg",
+      "width": 1440,
+      "height": 1281,
+      "date": "2025-04-03T18:10:21",
+      "downloaded": true,
+      "usedIn": [
+        "ireandlunaslife-blog"
+      ]
+    },
+    {
+      "id": 10,
+      "file": "library/header.png",
+      "title": "header",
+      "alt": "",
+      "caption": "",
+      "mime": "image/png",
+      "width": 1128,
+      "height": 668,
+      "date": "2025-04-03T18:10:21",
+      "downloaded": true,
+      "usedIn": []
+    },
+    {
+      "id": 9,
+      "file": "library/collage.png",
+      "title": "collage",
+      "alt": "",
+      "caption": "",
+      "mime": "image/png",
+      "width": 854,
+      "height": 729,
+      "date": "2025-04-03T18:10:20",
+      "downloaded": true,
+      "usedIn": []
+    },
+    {
+      "id": 8,
+      "file": "library/certificato.jpg",
+      "title": "certificato",
+      "alt": "",
+      "caption": "",
+      "mime": "image/jpeg",
+      "width": 1170,
+      "height": 836,
+      "date": "2025-04-03T18:10:20",
+      "downloaded": true,
+      "usedIn": [
+        "chi-sono",
+        "home",
+        "ireandlunaslife-blog"
+      ]
+    },
+    {
+      "id": 7,
+      "file": "library/background.jpg",
+      "title": "background",
+      "alt": "Sfondo arancione con segni di verniciatura",
+      "caption": "Sfondo arancione con segni di verniciatura",
+      "mime": "image/jpeg",
+      "width": 2754,
+      "height": 4896,
+      "date": "2025-04-03T18:10:20",
+      "downloaded": true,
+      "usedIn": [
+        "home"
+      ]
+    }
+  ],
+  "extra": []
+}

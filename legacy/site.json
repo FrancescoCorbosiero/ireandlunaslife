@@ -1,0 +1,142 @@
+{
+  "scrapedAt": "2026-11-07T10:39:50.490Z",
+  "source": "https://ireandlunaslife.it",
+  "name": "Ire and Luna's Life",
+  "tagline": "Educatrice cinofila & esperta in nutrizione",
+  "siteIcon": "https://ireandlunaslife.it/wp-content/uploads/2025/04/android-chrome-192x192-1.png",
+  "nav": [
+    {
+      "href": "https://ireandlunaslife.it/",
+      "text": "Home"
+    },
+    {
+      "href": "https://ireandlunaslife.it/blog/",
+      "text": "Blog"
+    },
+    {
+      "href": "https://ireandlunaslife.it/chi-sono/",
+      "text": "Chi sono"
+    },
+    {
+      "href": "https://ireandlunaslife.it/consulenze/",
+      "text": "Consulenze"
+    },
+    {
+      "href": "https://ireandlunaslife.it/contatti/",
+      "text": "Contatti"
+    },
+    {
+      "href": "https://ireandlunaslife.it/contatti/#home",
+      "text": "HOME"
+    },
+    {
+      "href": "https://ireandlunaslife.it/blog/",
+      "text": "BLOG"
+    },
+    {
+      "href": "https://ireandlunaslife.it/chi-sono/",
+      "text": "CHI SONO"
+    },
+    {
+      "href": "https://ireandlunaslife.it/consulenze/",
+      "text": "CONSULENZE"
+    },
+    {
+      "href": "https://ireandlunaslife.it/contatti/",
+      "text": "CONTATTI"
+    },
+    {
+      "href": "https://www.instagram.com/ireandlunaslife/",
+      "text": "📷 INSTAGRAM"
+    }
+  ],
+  "footerText": "2025 Ire & Luna’s Life. | Theme: ireandlunaslife by alpacode.studio.",
+  "categories": [
+    {
+      "id": 1,
+      "count": 1,
+      "name": "Senza categoria",
+      "slug": "senza-categoria"
+    }
+  ],
+  "pages": [
+    {
+      "kind": "pages",
+      "slug": "contatti",
+      "title": "Contatti",
+      "url": "https://ireandlunaslife.it/contatti/"
+    },
+    {
+      "kind": "pages",
+      "slug": "consulenze",
+      "title": "Consulenze",
+      "url": "https://ireandlunaslife.it/consulenze/"
+    },
+    {
+      "kind": "pages",
+      "slug": "chi-sono",
+      "title": "Chi sono",
+      "url": "https://ireandlunaslife.it/chi-sono/"
+    },
+    {
+      "kind": "pages",
+      "slug": "blog",
+      "title": "Blog",
+      "url": "https://ireandlunaslife.it/blog/"
+    },
+    {
+      "kind": "pages",
+      "slug": "home",
+      "title": "Home",
+      "url": "https://ireandlunaslife.it/"
+    },
+    {
+      "kind": "posts",
+      "slug": "ireandlunaslife-blog",
+      "title": "Il mio viaggio nel mondo della cinofilia",
+      "url": "https://ireandlunaslife.it/ireandlunaslife-blog/"
+    }
+  ],
+  "externalLinks": [
+    {
+      "href": "https://instagram.com/ireandlunaslife",
+      "text": "📷 INSTAGRAM"
+    },
+    {
+      "href": "https://www.instagram.com/ireandlunaslife/",
+      "text": ""
+    },
+    {
+      "href": "https://www.tiktok.com/@ireandlunaslife?_t=ZN-8vJQQ28cSXO&_r=1",
+      "text": ""
+    },
+    {
+      "href": "https://www.facebook.com/share/1BsukpDQSX/?mibextid=wwXIfr",
+      "text": ""
+    },
+    {
+      "href": "https://ojodediosbyire.etsy.com/",
+      "text": "Etsy"
+    },
+    {
+      "href": "https://www.instagram.com/irenebellapianta/",
+      "text": "@irenebellapianta"
+    },
+    {
+      "href": "https://www.teambranco.com/pages/irene-bellapianta",
+      "text": ""
+    },
+    {
+      "href": "https://wordpress.org/",
+      "text": ""
+    },
+    {
+      "href": "https://alpacode.studio/",
+      "text": "alpacode.studio"
+    },
+    {
+      "href": "https://docs.google.com/forms/d/1B9JAsYbZ6LBWKU1vyhkWXpnS-uC8aW7uE3Ihjty4mW0/viewform?fbclid=PAZXh0bgNhZW0CMTEAAacI0DlpAcXEzHjNdWERCz1av_OJZT1vdxJ3n1DpXhoO4iXDZa7Xl-ed8XMPIg_aem_KdDy0nSOzGRUSiyKma0Vuw&edit_requested=true",
+      "text": "CONTATTAMI"
+    }
+  ]
+}
