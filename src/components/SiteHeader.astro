@@ -1,0 +1,89 @@
+---
+import { SITE_NAME, SITE_TAGLINE, WA_LINK, HAS_WA, IG_URL, IG_HANDLE, TEAM_BRANCO_URL } from '../config';
+import WhatsAppIcon from './WhatsAppIcon.astro';
+import InstagramIcon from './InstagramIcon.astro';
+import ArrowIcon from './ArrowIcon.astro';
+
+interface Props {
+  active?: string;
+}
+const { active } = Astro.props;
+
+// Su desktop la barra tiene solo le voci corte: "Home" è il logo e
+// "Contatti" è il bottone a destra (l'azione principale, sempre in vista).
+// Nel menu mobile compaiono tutte (mobile: true = solo lì). Team Branco è
+// una pillola con il bordo: si nota, ma non compete con il bottone.
+const nav = [
+  { href: '/', label: 'Home', key: 'home', mobile: true },
+  { href: '/chi-sono', label: 'Chi sono', key: 'chi-sono' },
+  { href: '/consulenze', label: 'Consulenze', key: 'consulenze' },
+  { href: '/blog', label: 'Blog', key: 'blog' },
+  { href: '/contatti', label: 'Contatti', key: 'contatti', mobile: true },
+  { href: TEAM_BRANCO_URL, label: 'Team Branco', key: 'team', work: true, external: true },
+];
+---
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="brand-lockup" href="/" aria-label={`${SITE_NAME}: home`}>
+      <span class="lockup-mark">
+        <img src="/assets/logo.jpg" alt="Irene e Luna disegnate in stile cartoon" width="42" height="42" />
+      </span>
+      <span class="lockup-text">
+        <span class="lockup-name">{SITE_NAME}</span>
+        <span class="lockup-tag">{SITE_TAGLINE}</span>
+      </span>
+    </a>
+    <nav class="site-nav" data-nav aria-label="Navigazione principale">
+      {
+        nav.map((item, i) => (
+          <a
+            href={item.href}
+            style={`--i:${i}`}
+            class:list={[{ 'nav-work': item.work, 'nav-mobile': item.mobile, active: active === item.key }]}
+            aria-current={active === item.key ? 'page' : undefined}
+            {...(item.external ? { target: '_blank', rel: 'noopener' } : {})}
+          >
+            {item.label}
+          </a>
+        ))
+      }
+      <!-- Solo nel menu mobile: le azioni in fondo al foglio. -->
+      <div class="nav-foot">
+        <a class="btn btn-dark" href="/contatti#scrivimi">
+          Prenota una consulenza <ArrowIcon size={15} />
+        </a>
+        {
+          HAS_WA && (
+            <a class="btn btn-ghost" href={WA_LINK} target="_blank" rel="noopener">
+              <WhatsAppIcon size={16} /> WhatsApp
+            </a>
+          )
+        }
+        <a class="nav-ig" href={IG_URL} target="_blank" rel="noopener">
+          <InstagramIcon size={18} />
+          {IG_HANDLE}
+        </a>
+      </div>
+    </nav>
+    <div class="header-actions">
+      <a class="header-icon header-ig" href={IG_URL} target="_blank" rel="noopener" aria-label="Instagram di Irene e Luna">
+        <InstagramIcon size={18} />
+      </a>
+      {
+        HAS_WA && (
+          <a class="header-icon header-wa" href={WA_LINK} target="_blank" rel="noopener" aria-label="Scrivi a Irene su WhatsApp">
+            <WhatsAppIcon size={18} />
+          </a>
+        )
+      }
+      <a class="btn btn-sm header-cta" href="/contatti#scrivimi">
+        Contattami <ArrowIcon size={14} />
+      </a>
+      <button class="nav-toggle" data-nav-toggle aria-label="Apri menu" aria-expanded="false">
+        <span />
+        <span />
+        <span />
+      </button>
+    </div>
+  </div>
+</header>

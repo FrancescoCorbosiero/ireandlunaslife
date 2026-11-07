@@ -1,0 +1,746 @@
+/* =====================================================================
+   Ire & Luna's Life: comportamenti del sito.
+   Compatibile con le View Transitions (Astro ClientRouter):
+   - i listener globali (window/document) si registrano UNA volta sola;
+   - gli inizializzatori legati agli elementi girano a ogni `astro:page-load`
+     (gli elementi vecchi vengono scartati dallo swap, niente doppi bind).
+   ===================================================================== */
+import { WA_NUMBER, HAS_WA, EMAIL, FORM_ENDPOINT } from '../config';
+import { lockScroll, scrollToTarget, stepEnter, stepProgress, nudge, successBurst, swing, celebrate } from './motion';
+// Quando attiverai cal.com, importa anche CAL_LINK da '../config'.
+
+function waLink(text: string): string {
+  return 'https://wa.me/' + WA_NUMBER + '?text=' + encodeURIComponent(text);
+}
+
+/* ── Invio form ──────────────────────────────────────────────────
+   Un solo punto di uscita per entrambi i form, endpoint configurabile:
+   · FORM_ENDPOINT vuoto → Netlify Forms (POST alla pagina, i form
+     statici con name= + data-netlify sono registrati dal bot di deploy);
+   · FORM_ENDPOINT valorizzato (es. /api/form nell'immagine Docker) → il
+     server inoltra via AWS SES. Stesso payload urlencoded, `form-name`
+     incluso. WhatsApp resta: il questionario lo apre comunque.
+   In `astro dev` non c'è nessun endpoint: l'invio fallisce e scatta
+   il fallback (per il questionario resta comunque WhatsApp). */
+function encodeForm(form: HTMLFormElement): string {
+  const params = new URLSearchParams();
+  new FormData(form).forEach((value, key) => {
+    params.append(key, typeof value === 'string' ? value : value.name);
+  });
+  return params.toString();
+}
+function submitForm(form: HTMLFormElement): Promise<boolean> {
+  return fetch(FORM_ENDPOINT || '/', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded', Accept: 'application/json' },
+    body: encodeForm(form),
+    // keepalive: la richiesta sopravvive anche se l'utente naviga subito via.
+    keepalive: true,
+  })
+    .then((res) => res.ok)
+    .catch(() => false);
+}
+
+/* ── Mobile nav ──────────────────────────────────────────────── */
+function setNavOpen(nav: HTMLElement, toggle: HTMLElement, open: boolean): void {
+  nav.classList.toggle('open', open);
+  toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+  toggle.setAttribute('aria-label', open ? 'Chiudi menu' : 'Apri menu');
+  // Il menu mobile è un foglio a tutto schermo: la pagina sotto sta ferma.
+  lockScroll(open);
+}
+/* Chiusura da listener globali (Escape / click fuori): interroga il DOM
+   corrente, così funziona anche dopo gli swap delle View Transitions. */
+function closeNav(refocus = false): void {
+  const nav = document.querySelector<HTMLElement>('[data-nav]');
+  const toggle = document.querySelector<HTMLButtonElement>('[data-nav-toggle]');
+  if (!nav || !toggle || !nav.classList.contains('open')) return;
+  setNavOpen(nav, toggle, false);
+  if (refocus) toggle.focus();
+}
+function initNav(): void {
+  const toggle = document.querySelector<HTMLButtonElement>('[data-nav-toggle]');
+  const nav = document.querySelector<HTMLElement>('[data-nav]');
+  if (!toggle || !nav) return;
+  toggle.addEventListener('click', () => {
+    setNavOpen(nav, toggle, !nav.classList.contains('open'));
+  });
+  nav.querySelectorAll('a').forEach((a) => {
+    a.addEventListener('click', () => setNavOpen(nav, toggle, false));
+  });
+}
+
+/* ── Validazione campo ───────────────────────────────────────── */
+function validateField(field: Element): boolean {
+  const input = field.querySelector<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>(
+    'input, textarea, select'
+  );
+  if (!input) return true;
+  let ok = true;
+  if (input.hasAttribute('required') && !input.value.trim()) ok = false;
+  const type = (input as HTMLInputElement).type;
+  if (type === 'email' && input.value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.value)) ok = false;
+  if (type === 'tel' && input.value && input.value.replace(/\D/g, '').length < 6) ok = false;
+  // Collega il messaggio d'errore all'input per le tecnologie assistive.
+  const err = field.querySelector<HTMLElement>('.field-error');
+  if (err && input.id) {
+    if (!err.id) err.id = `${input.id}-error`;
+    input.setAttribute('aria-describedby', err.id);
+  }
+  input.setAttribute('aria-invalid', ok ? 'false' : 'true');
+  field.classList.toggle('show-error', !ok);
+  input.classList.toggle('invalid', !ok);
+  return ok;
+}
+
+/* ── Navigazione a step (condivisa dai questionari) ──────────── */
+interface StepController {
+  panels: HTMLElement[];
+  readonly current: number;
+  validatePanel(i: number): boolean;
+  validateAll(): boolean;
+  showSuccess(): void;
+}
+
+function setupSteps(form: HTMLFormElement): StepController {
+  const panels = Array.from(form.querySelectorAll<HTMLElement>('.step-panel'));
+  const dots = Array.from(form.querySelectorAll<HTMLElement>('.step-dot'));
+  let current = 0;
+
+  function show(i: number, focusFirst = false): void {
+    const dir = i >= current ? 1 : -1;
+    const changed = i !== current;
+    current = i;
+    panels.forEach((p, idx) => p.classList.toggle('active', idx === i));
+    dots.forEach((d, idx) => {
+      d.classList.toggle('done', idx < i);
+      d.classList.toggle('current', idx === i);
+    });
+    // Animazioni (motion.ts) solo sulle navigazioni dell'utente.
+    stepProgress(form, i, focusFirst && changed);
+    if (focusFirst && changed) stepEnter(panels[i], dir);
+    // Il focus solo sulle navigazioni dell'utente: all'init ruberebbe
+    // focus e scroll alla pagina appena caricata.
+    if (!focusFirst) return;
+    const firstInput = panels[i].querySelector<HTMLElement>('input, textarea, select');
+    if (firstInput) setTimeout(() => firstInput.focus(), 120);
+  }
+  function validatePanel(i: number): boolean {
+    const invalid = Array.from(panels[i].querySelectorAll('.field')).filter((f) => !validateField(f));
+    nudge(invalid);
+    return invalid.length === 0;
+  }
+  // Al submit vanno controllati TUTTI gli step: l'implicit form submission
+  // (Enter in un input) può arrivare da uno step intermedio.
+  function validateAll(): boolean {
+    for (let i = 0; i < panels.length; i++) {
+      if (!validatePanel(i)) {
+        show(i, true);
+        return false;
+      }
+    }
+    return true;
+  }
+  function showSuccess(): void {
+    panels.forEach((p) => p.classList.remove('active'));
+    const head = form.querySelector<HTMLElement>('.steps-head');
+    if (head) head.style.display = 'none';
+    const success = form.querySelector<HTMLElement>('.form-success');
+    if (success) {
+      success.classList.add('show');
+      success.focus(); // il markup ha tabindex="-1" + role="status"
+      successBurst(success);
+    }
+  }
+
+  form.querySelectorAll('[data-next]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      if (!validatePanel(current)) return;
+      if (current < panels.length - 1) show(current + 1, true);
+    });
+  });
+  form.querySelectorAll('[data-prev]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      if (current > 0) show(current - 1, true);
+    });
+  });
+  // Enter su uno step intermedio = "Continua", non submit.
+  form.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter') return;
+    if (e.target instanceof HTMLTextAreaElement) return;
+    if (current < panels.length - 1) {
+      e.preventDefault();
+      if (validatePanel(current)) show(current + 1, true);
+    }
+  });
+  form.querySelectorAll('input, textarea, select').forEach((inp) => {
+    inp.addEventListener('input', () => {
+      const field = inp.closest('.field');
+      if (field) {
+        field.classList.remove('show-error');
+        inp.classList.remove('invalid');
+      }
+    });
+  });
+
+  show(0);
+  return {
+    panels,
+    get current() {
+      return current;
+    },
+    validatePanel,
+    validateAll,
+    showSuccess,
+  };
+}
+
+/* ── Modulo "Scrivimi" (a step) ──────────────────────────────────
+   Due strade, decise da WA_NUMBER in config.ts:
+   · con il numero → WhatsApp-first come nella codebase originale: si apre
+     WhatsApp con il messaggio pronto e, in background, il contatto viene
+     salvato via submitForm() (se la persona non invia, il lead resta);
+   · senza numero → submitForm() (AWS SES / Netlify Forms) e conferma; se
+     l'invio fallisce, un link email con il messaggio già compilato. */
+function stepFormText(d: FormData): { nome: string; text: string } {
+  const get = (k: string): string => (d.get(k) || '').toString().trim();
+  const nome = get('nome');
+  const lines = [
+    'Ciao Irene, ti scrivo dal sito.',
+    '',
+    'Nome: ' + nome,
+    'Mi serve: ' + (get('servizio') || '—'),
+    'Il mio cane: ' + (get('animale') || '—'),
+    'Email: ' + (get('email') || '—'),
+    'Telefono: ' + (get('telefono') || '—'),
+  ];
+  return { nome, text: lines.join('\n') };
+}
+function mailHref(subject: string, body: string): string {
+  return 'mailto:' + EMAIL + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+}
+
+function initStepForm(): void {
+  const form = document.querySelector<HTMLFormElement>('[data-stepform]');
+  if (!form) return;
+  const formEl = form;
+  const steps = setupSteps(form);
+  const errorBox = form.querySelector<HTMLElement>('[data-form-error]');
+  let sending = false;
+
+  // ?servizio=alimentazione (dai bottoni di /consulenze) preseleziona la voce.
+  const select = form.querySelector<HTMLSelectElement>('[data-servizio]');
+  const hint = form.querySelector<HTMLElement>('[data-nutrition-hint]');
+  const syncHint = (): void => {
+    if (hint && select) hint.hidden = select.value !== 'Alimentazione';
+  };
+  const wanted = new URLSearchParams(location.search).get('servizio');
+  if (select && wanted) {
+    const opt = Array.from(select.options).find((o) => o.value.toLowerCase().startsWith(wanted.toLowerCase()));
+    if (opt) select.value = opt.value;
+  }
+  select?.addEventListener('change', syncHint);
+  syncHint();
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (sending || !steps.validateAll()) return;
+    const { nome, text } = stepFormText(new FormData(formEl));
+    const subject = 'Contatto dal sito: ' + nome;
+
+    if (HAS_WA) {
+      const waBtn = formEl.querySelector<HTMLAnchorElement>('[data-wa-out]');
+      if (waBtn) waBtn.href = waLink(text);
+      const mailBtn = formEl.querySelector<HTMLAnchorElement>('[data-mail-out]');
+      if (mailBtn) mailBtn.href = mailHref(subject, text);
+      void submitForm(formEl);
+      steps.showSuccess();
+      window.open(waLink(text), '_blank', 'noopener');
+      return;
+    }
+
+    sending = true;
+    errorBox?.classList.remove('show');
+    const submitBtn = formEl.querySelector<HTMLButtonElement>('button[type="submit"]');
+    const submitHtml = submitBtn?.innerHTML ?? '';
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.setAttribute('aria-busy', 'true');
+      submitBtn.textContent = 'Invio in corso…';
+    }
+    const ok = await submitForm(formEl);
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.removeAttribute('aria-busy');
+      submitBtn.innerHTML = submitHtml;
+    }
+    sending = false;
+    if (ok) {
+      steps.showSuccess();
+      formEl.reset();
+      return;
+    }
+    const mail = errorBox?.querySelector<HTMLAnchorElement>('[data-error-mail]');
+    if (mail) mail.href = mailHref(subject, text);
+    errorBox?.classList.add('show');
+  });
+}
+
+/* ── "Come si chiama il tuo animale?" (consulenza) ───────────────
+   Il nome scritto compare sulla medaglietta e nella scheda; il pulsante
+   porta al questionario e precompila lo step 2 con il nome. */
+function initMirror(): void {
+  const root = document.querySelector<HTMLElement>('[data-mirror]');
+  if (!root) return;
+  const input = root.querySelector<HTMLInputElement>('[data-mirror-input]');
+  const tag = root.querySelector<HTMLElement>('[data-pet-tag]');
+  const fallback = input?.placeholder || 'Birba';
+  const name = (): string => (input?.value ?? '').trim().replace(/\s+/g, ' ');
+  const update = (): void => {
+    const typed = name();
+    root.querySelectorAll<HTMLElement>('[data-pet-name]').forEach((el) => {
+      el.textContent = typed || fallback;
+      el.classList.toggle('is-placeholder', !typed);
+    });
+  };
+  input?.addEventListener('input', () => {
+    update();
+    if (tag) swing(tag);
+  });
+  root.querySelector('[data-mirror-cta]')?.addEventListener('click', () => {
+    const typed = name();
+    const story = document.querySelector<HTMLTextAreaElement>('#f-animale');
+    if (typed && story && !story.value.trim()) story.value = `Si chiama ${typed}. `;
+  });
+  update();
+}
+
+/* ── "Ti riconosci?" (lavora con noi) ────────────────────────────
+   Ogni profilo è uno sticker: toccarlo lo segna e preseleziona l'ambito
+   nel modulo di candidatura, con un invito a raggiungerlo. */
+function initProfileWall(): void {
+  const wall = document.querySelector<HTMLElement>('[data-profile-wall]');
+  if (!wall) return;
+  const select = document.querySelector<HTMLSelectElement>('#w-ambito');
+  const hint = document.querySelector<HTMLElement>('[data-wall-hint]');
+  const text = hint?.querySelector<HTMLElement>('[data-wall-text]');
+  wall.addEventListener('click', (e) => {
+    const btn = (e.target as HTMLElement).closest<HTMLButtonElement>('button[data-ambito]');
+    if (!btn) return;
+    const on = btn.getAttribute('aria-pressed') !== 'true';
+    wall.querySelectorAll<HTMLButtonElement>('button[data-ambito]').forEach((b) => {
+      b.setAttribute('aria-pressed', String(b === btn && on));
+    });
+    const ambito = btn.dataset.ambito ?? '';
+    if (select && (on || select.value === ambito)) {
+      select.value = on ? ambito : '';
+      // Toglie l'eventuale errore di validazione rimasto sul campo.
+      select.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+    if (hint && text) {
+      hint.hidden = !on;
+      text.textContent = on
+        ? `Ti riconosci in «${(btn.textContent ?? '').trim()}»: nel modulo ho già scelto l'ambito «${ambito}».`
+        : '';
+    }
+    if (on) celebrate(btn, { count: 10, spread: 0.55 });
+  });
+}
+
+/* ── CTA fissa delle landing ─────────────────────────────────────
+   Compare quando l'hero ([data-sticky-from]) è uscito dallo schermo e
+   sparisce sopra la sezione finale ([data-sticky-until]). */
+let stickyObserver: IntersectionObserver | null = null;
+function initStickyCta(): void {
+  stickyObserver?.disconnect();
+  stickyObserver = null;
+  const cta = document.querySelector<HTMLElement>('[data-sticky-cta]');
+  const from = document.querySelector<HTMLElement>('[data-sticky-from]');
+  if (!cta || !from || !('IntersectionObserver' in window)) return;
+  const until = document.querySelector<HTMLElement>('[data-sticky-until]');
+  const seen = new Map<Element, boolean>([[from, true]]);
+  const apply = (): void => {
+    const show = !seen.get(from) && !(until && seen.get(until));
+    cta.classList.toggle('is-visible', show);
+  };
+  stickyObserver = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((e) => seen.set(e.target, e.isIntersecting));
+      apply();
+    },
+    { rootMargin: '0px 0px -12% 0px' }
+  );
+  stickyObserver.observe(from);
+  if (until) stickyObserver.observe(until);
+}
+
+/* ── Blog: filtro per categoria + ricerca live ───────────────────
+   Stato (categoria e query) sincronizzato nell'URL (?cat=…&q=…):
+   i filtri sono condivisibili e sopravvivono a refresh/back. */
+function initBlogFilter(): void {
+  const bar = document.querySelector<HTMLElement>('[data-blog-filters]');
+  if (!bar) return;
+  const chips = Array.from(bar.querySelectorAll<HTMLButtonElement>('.chip'));
+  const cards = Array.from(
+    document.querySelectorAll<HTMLElement>('[data-blog-grid] [data-cat]')
+  );
+  const search = document.querySelector<HTMLInputElement>('[data-blog-search]');
+  const empty = document.querySelector<HTMLElement>('[data-blog-empty]');
+  const counter = document.querySelector<HTMLElement>('[data-blog-count]');
+
+  // Stessa normalizzazione dell'indice generato in ArticleCard.astro.
+  const norm = (s: string) =>
+    s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+
+  let cat = '*';
+  let query = '';
+
+  function apply(syncUrl = true): void {
+    const q = norm(query.trim());
+    let visible = 0;
+    cards.forEach((card) => {
+      const okCat = cat === '*' || card.dataset.cat === cat;
+      const okQuery = !q || (card.dataset.search || '').includes(q);
+      const show = okCat && okQuery;
+      card.classList.toggle('is-hidden', !show);
+      if (show) visible++;
+    });
+    chips.forEach((c) => {
+      const active = (c.dataset.cat || '*') === cat;
+      c.classList.toggle('is-active', active);
+      c.setAttribute('aria-pressed', String(active));
+    });
+    if (empty) empty.hidden = visible > 0;
+    if (counter) {
+      counter.textContent =
+        visible === 1 ? '1 articolo trovato' : `${visible} articoli trovati`;
+    }
+    if (syncUrl) {
+      const params = new URLSearchParams(location.search);
+      if (cat === '*') params.delete('cat');
+      else params.set('cat', cat);
+      if (!query.trim()) params.delete('q');
+      else params.set('q', query.trim());
+      const qs = params.toString();
+      // replaceState conserva history.state (scroll delle View Transitions).
+      history.replaceState(history.state, '', location.pathname + (qs ? `?${qs}` : '') + location.hash);
+    }
+  }
+
+  bar.addEventListener('click', (e) => {
+    const chip = (e.target as HTMLElement).closest<HTMLButtonElement>('.chip');
+    if (!chip) return;
+    cat = chip.dataset.cat || '*';
+    apply();
+  });
+
+  let debounce = 0;
+  search?.addEventListener('input', () => {
+    window.clearTimeout(debounce);
+    debounce = window.setTimeout(() => {
+      query = search.value;
+      apply();
+    }, 120);
+  });
+
+  document.querySelector<HTMLButtonElement>('[data-blog-reset]')?.addEventListener('click', () => {
+    cat = '*';
+    query = '';
+    if (search) search.value = '';
+    apply();
+    search?.focus();
+  });
+
+  // Stato iniziale dall'URL (link condivisi, refresh, back/forward).
+  const params = new URLSearchParams(location.search);
+  const urlCat = params.get('cat');
+  if (urlCat && chips.some((c) => c.dataset.cat === urlCat)) cat = urlCat;
+  query = params.get('q') ?? '';
+  if (search && query) search.value = query;
+  if (cat !== '*' || query) apply(false);
+}
+
+/* ── Storie vere (home): carosello nativo + prima/dopo ──────────
+   Lo scorrimento è quello nativo (swipe, trackpad, scroll-snap): qui solo
+   frecce, contatore "1 / 3", pallini e i cursori prima/dopo. */
+function initStoryCarousel(): void {
+  const root = document.querySelector<HTMLElement>('[data-sv]');
+  const track = root?.querySelector<HTMLElement>('[data-sv-track]');
+  if (!root || !track) return;
+  const cards = Array.from(track.children) as HTMLElement[];
+  const count = root.querySelector<HTMLElement>('[data-sv-count]');
+  const dots = Array.from(root.querySelectorAll<HTMLElement>('[data-sv-dots] i'));
+  const prev = root.querySelector<HTMLButtonElement>('[data-sv-prev]');
+  const next = root.querySelector<HTMLButtonElement>('[data-sv-next]');
+  const smooth = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let index = 0;
+  // La card "attuale" è quella più vicina al bordo d'aggancio (lo
+  // scroll-padding coincide con il padding sinistro della fascia).
+  const padStart = (): number => parseFloat(getComputedStyle(track).paddingLeft) || 0;
+  const update = (): void => {
+    const x = track.scrollLeft + padStart();
+    let best = 0;
+    cards.forEach((c, i) => {
+      if (Math.abs(c.offsetLeft - x) < Math.abs(cards[best].offsetLeft - x)) best = i;
+    });
+    index = best;
+    if (count) count.textContent = `${index + 1} / ${cards.length}`;
+    dots.forEach((d, i) => d.classList.toggle('on', i === index));
+    if (prev) prev.disabled = track.scrollLeft <= 2;
+    if (next) next.disabled = track.scrollLeft >= track.scrollWidth - track.clientWidth - 2;
+  };
+  const go = (i: number): void => {
+    const card = cards[Math.max(0, Math.min(cards.length - 1, i))];
+    track.scrollTo({ left: card.offsetLeft - padStart(), behavior: smooth ? 'smooth' : 'auto' });
+  };
+  prev?.addEventListener('click', () => go(index - 1));
+  next?.addEventListener('click', () => go(index + 1));
+  let raf = 0;
+  track.addEventListener(
+    'scroll',
+    () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(update);
+    },
+    { passive: true }
+  );
+  track.addEventListener('keydown', (e) => {
+    // Le frecce sul cursore prima/dopo muovono il cursore, non il carosello.
+    if (e.target instanceof Element && e.target.closest('input, select, textarea')) return;
+    if (e.key === 'ArrowRight') {
+      e.preventDefault();
+      go(index + 1);
+    } else if (e.key === 'ArrowLeft') {
+      e.preventDefault();
+      go(index - 1);
+    }
+  });
+  update();
+
+  // Prima/dopo: il range (invisibile, a tutta superficie) muove la linea.
+  root.querySelectorAll<HTMLElement>('[data-compare]').forEach((cmp) => {
+    const input = cmp.querySelector<HTMLInputElement>('input[type="range"]');
+    if (!input) return;
+    const set = (): void => cmp.style.setProperty('--x', `${input.value}%`);
+    input.addEventListener('input', set);
+    set();
+  });
+}
+
+/* ── Selettore di percorso (contatti) ────────────────────────── */
+function initPathSelector(): void {
+  const cards = document.querySelectorAll<HTMLElement>('[data-path]');
+  if (!cards.length) return;
+  const sections = document.querySelectorAll<HTMLElement>('[data-path-target]');
+  function select(key: string): void {
+    cards.forEach((c) => c.classList.toggle('selected', c.getAttribute('data-path') === key));
+    sections.forEach((s) => {
+      s.style.display = s.getAttribute('data-path-target') === key ? '' : 'none';
+    });
+  }
+  cards.forEach((c) =>
+    c.addEventListener('click', () => select(c.getAttribute('data-path') || 'famiglia'))
+  );
+  const p = new URLSearchParams(location.search).get('p');
+  select(p === 'pro' ? 'pro' : 'famiglia');
+}
+
+/* ── Booking: slot → conferma WhatsApp (modale consulenza) ───── */
+function callText(slot: string): string {
+  return (
+    'Ciao Irene! Vorrei prenotare una consulenza' +
+    (slot ? ' — slot preferito: ' + slot : '') +
+    '.'
+  );
+}
+function initBookings(): void {
+  document.querySelectorAll<HTMLElement>('[data-booking]').forEach((group) => {
+    const slots = group.querySelectorAll<HTMLButtonElement>('.cal-slot');
+    const out = group.querySelector<HTMLElement>('[data-cal-confirm]');
+    const waBtn = group.querySelector<HTMLAnchorElement>('[data-cal-wa]');
+    slots.forEach((s) => {
+      s.addEventListener('click', () => {
+        slots.forEach((x) => x.classList.remove('sel'));
+        s.classList.add('sel');
+        const slot = (s.textContent || '').trim();
+        if (out) {
+          out.style.display = 'flex';
+          const label = out.querySelector<HTMLElement>('[data-cal-label]');
+          if (label) label.textContent = slot;
+        }
+        if (waBtn) waBtn.href = waLink(callText(slot));
+      });
+    });
+  });
+}
+
+/* ── Modale call (apertura/chiusura via delega globale) ──────── */
+let lastCallTrigger: HTMLElement | null = null;
+
+function openCall(): void {
+  const ov = document.querySelector<HTMLElement>('[data-call-modal]');
+  if (!ov) return;
+  lastCallTrigger = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+  ov.hidden = false;
+  document.documentElement.style.overflow = 'hidden';
+  lockScroll(true);
+  const f = ov.querySelector<HTMLElement>('.cal-slot');
+  if (f) setTimeout(() => f.focus(), 60);
+}
+function closeCall(): void {
+  const ov = document.querySelector<HTMLElement>('[data-call-modal]');
+  if (!ov || ov.hidden) return;
+  ov.hidden = true;
+  document.documentElement.style.overflow = '';
+  lockScroll(false);
+  // Il focus torna al pulsante che ha aperto il modale.
+  if (lastCallTrigger && document.contains(lastCallTrigger)) lastCallTrigger.focus();
+  lastCallTrigger = null;
+}
+// aria-modal dichiara il resto della pagina inerte: il Tab deve restare nel dialog.
+function trapCallFocus(e: KeyboardEvent): void {
+  const ov = document.querySelector<HTMLElement>('[data-call-modal]');
+  if (!ov || ov.hidden) return;
+  const focusables = Array.from(
+    ov.querySelectorAll<HTMLElement>('button, a[href], input, select, textarea')
+  ).filter((el) => el.offsetParent !== null);
+  if (!focusables.length) return;
+  const first = focusables[0];
+  const last = focusables[focusables.length - 1];
+  const active = document.activeElement;
+  if (e.shiftKey && (active === first || !ov.contains(active))) {
+    e.preventDefault();
+    last.focus();
+  } else if (!e.shiftKey && (active === last || !ov.contains(active))) {
+    e.preventDefault();
+    first.focus();
+  }
+}
+
+/* ── Copia link con fallback (contesti senza Clipboard API) ──── */
+function copyPageUrl(btn: HTMLElement): void {
+  const feedback = () => {
+    const original = btn.textContent;
+    btn.textContent = 'Link copiato!';
+    window.setTimeout(() => {
+      btn.textContent = original;
+    }, 1800);
+  };
+  const legacyCopy = () => {
+    const ta = document.createElement('textarea');
+    ta.value = window.location.href;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try {
+      if (document.execCommand('copy')) feedback();
+    } finally {
+      ta.remove();
+    }
+  };
+  if (navigator.clipboard?.writeText) {
+    navigator.clipboard.writeText(window.location.href).then(feedback).catch(legacyCopy);
+  } else {
+    legacyCopy();
+  }
+}
+
+/* ── Elevazione header allo scroll ───────────────────────────── */
+function updateHeader(): void {
+  const h = document.querySelector<HTMLElement>('.site-header');
+  if (h) h.style.boxShadow = window.scrollY > 8 ? '0 8px 28px -20px rgba(31,37,21,0.5)' : 'none';
+}
+
+/* ── Avanzamento lettura (pagine articolo) ───────────────────── */
+function updateReadProgress(): void {
+  const bar = document.querySelector<HTMLElement>('[data-progress]');
+  if (!bar) return;
+  const doc = document.documentElement;
+  const max = doc.scrollHeight - doc.clientHeight;
+  const pct = max > 0 ? Math.min(100, (window.scrollY / max) * 100) : 0;
+  bar.style.width = pct.toFixed(2) + '%';
+}
+
+/* ── Torna su: visibilità + anello di avanzamento ────────────── */
+const RING_LEN = 100.53; // 2π · r(16)
+function updateToTop(): void {
+  const btn = document.querySelector<HTMLElement>('[data-to-top]');
+  if (!btn) return;
+  const doc = document.documentElement;
+  btn.classList.toggle('show', window.scrollY > 480);
+  const ring = btn.querySelector<SVGCircleElement>('[data-ring]');
+  if (ring) {
+    const max = doc.scrollHeight - doc.clientHeight;
+    const p = max > 0 ? Math.min(1, window.scrollY / max) : 0;
+    // Tratto lungo p·L e vuoto più lungo del cerchio: niente ripetizioni
+    // del dash né arrotondamenti che chiudono male l'anello.
+    ring.style.strokeDasharray = `${(RING_LEN * p).toFixed(2)} ${RING_LEN + 1}`;
+  }
+}
+
+/* ── Listener globali (una sola volta) ───────────────────────── */
+let globalsReady = false;
+function initGlobals(): void {
+  if (globalsReady) return;
+  globalsReady = true;
+
+  let ticking = false;
+  const onScroll = () => {
+    updateHeader();
+    if (!ticking) {
+      ticking = true;
+      requestAnimationFrame(() => {
+        updateReadProgress();
+        updateToTop();
+        ticking = false;
+      });
+    }
+  };
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onScroll, { passive: true });
+
+  // Modale "Richiedi la tua consulenza gratuita": delega → robusta tra le navigazioni.
+  document.addEventListener('click', (e) => {
+    const t = e.target as HTMLElement;
+    if (t.closest('[data-open-call]')) {
+      e.preventDefault();
+      openCall();
+    } else if (t.closest('[data-close-call]')) {
+      closeCall();
+    } else if (t.closest('[data-to-top]')) {
+      scrollToTarget(0);
+    } else if (t.closest('[data-copy-url]')) {
+      const btn = t.closest<HTMLElement>('[data-copy-url]');
+      if (btn) copyPageUrl(btn);
+    } else if (!t.closest('.site-header')) {
+      // Click/tap fuori dall'header: il menu mobile aperto si chiude.
+      closeNav();
+    }
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      closeCall();
+      closeNav(true);
+    } else if (e.key === 'Tab') trapCallFocus(e);
+  });
+}
+
+/* ── Per pagina (anche dopo ogni view transition) ───────────── */
+function onPageLoad(): void {
+  initNav();
+  initMirror();
+  initProfileWall();
+  initStickyCta();
+  initStepForm();
+  initBlogFilter();
+  initStoryCarousel();
+  initPathSelector();
+  initBookings();
+  updateHeader();
+  updateReadProgress();
+  updateToTop();
+}
+
+initGlobals();
+document.addEventListener('astro:page-load', onPageLoad);

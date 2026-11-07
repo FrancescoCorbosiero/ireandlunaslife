@@ -1,0 +1,37 @@
+---
+import Base from '../layouts/Base.astro';
+import ArrowIcon from '../components/ArrowIcon.astro';
+import Sticker from '../components/Sticker.astro';
+import lunaPrato from '../assets/stickers/luna-prato.webp';
+import { SITE_NAME } from '../config';
+---
+<Base
+  title={`Pagina non trovata · ${SITE_NAME}`}
+  description="La pagina che cerchi non esiste o è stata spostata."
+  robots="noindex, follow"
+>
+  <section class="section bg-deep paper-bg-deep nf" style="min-height:calc(100svh - 70px); display:flex; align-items:center;">
+    <div class="container container-narrow">
+      <div class="cta-band">
+        <span class="eyebrow">Errore 404</span>
+        <h1 class="display-xl">Ops, Luna l'ha <span class="script">sotterrata.</span></h1>
+        <p class="lead">
+          La pagina che cerchi non esiste o è stata spostata. Torniamo sulla strada giusta?
+        </p>
+        <div class="cta-row">
+          <a class="btn btn-lg" href="/">Vai alla home <ArrowIcon size={16} /></a>
+          <a class="btn btn-ghost-milk btn-lg" href="/contatti">Contattami</a>
+        </div>
+      </div>
+    </div>
+    <Sticker src={lunaPrato} width={170} rotate={6} class="nf-stk" data-float />
+  </section>
+</Base>
+
+<style>
+  .nf { position: relative; overflow: hidden; }
+  .nf :global(.nf-stk) { position: absolute; right: clamp(12px, 8vw, 140px); bottom: 40px; }
+  @media (max-width: 720px) {
+    .nf :global(.nf-stk) { --w: 110px !important; right: 10px; bottom: 16px; opacity: 0.9; }
+  }
+</style>

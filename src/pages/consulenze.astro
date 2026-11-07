@@ -1,0 +1,189 @@
+---
+import Base from '../layouts/Base.astro';
+import ArrowIcon from '../components/ArrowIcon.astro';
+import CoverImage from '../components/CoverImage.astro';
+import Sticker from '../components/Sticker.astro';
+import Ticker from '../components/Ticker.astro';
+import educazionePhoto from '../assets/irene-lago.jpg';
+import alimentazionePhoto from '../assets/luna-ciotola.jpg';
+import dogSittingPhoto from '../assets/dog-sitting.jpg';
+import stkLunaPrato from '../assets/stickers/luna-prato.webp';
+import stkLunaMuso from '../assets/stickers/luna-muso.webp';
+import stkAvatar from '../assets/stickers/avatar.webp';
+import { SITE_NAME, NUTRITION_FORM_URL } from '../config';
+
+// Stesso URL della pagina "Consulenze" del vecchio sito WordPress.
+const ticker = ['Educazione', 'Alimentazione', 'Dog-sitting', 'Percorsi su misura', 'Con Luna, sempre'];
+---
+<Base
+  active="consulenze"
+  title={`Consulenze · ${SITE_NAME}`}
+  description="Educazione cinofila, piano alimentare personalizzato e dog-sitting: tre modi per stare bene insieme al tuo cane, con Irene Bellapianta, educatrice cinofila APNEC."
+  ogTitle={`Consulenze · ${SITE_NAME}`}
+  ogDescription="Educazione, alimentazione su misura e dog-sitting."
+  ogImage="/assets/hero.jpg"
+  ogImageAlt="Irene e Luna sdraiate insieme sul pavimento"
+  ogImageWidth={1440}
+  ogImageHeight={1281}
+>
+  <!-- INTRO -->
+  <section class="section-tight sv-intro">
+    <div class="container">
+      <div class="head-block" style="max-width:780px;">
+        <span class="eyebrow kicker-rule" data-intro style="--intro-d:0.05s;">Le consulenze</span>
+        <h1 class="display-xl intro-lines">
+          <span class="line"><span>Tre modi per</span></span>
+          <span class="line"><span><span class="script">stare bene insieme.</span></span></span>
+        </h1>
+        <p class="lead" data-intro style="--intro-d:0.5s;">
+          Ogni cane ha il suo carattere, le sue difficoltà e le sue risorse uniche. Per questo ogni
+          percorso parte da voi due: dalla vostra relazione, dalla sua ciotola, dalla vostra
+          quotidianità.
+        </p>
+        <nav class="sv-jump" data-intro style="--intro-d:0.65s;" aria-label="Vai al servizio">
+          <a class="pill" href="#educazione">🎓 Educazione</a>
+          <a class="pill pill-coral" href="#alimentazione">🥩 Alimentazione</a>
+          <a class="pill pill-sun" href="#dog-sitting">🐕 Dog-sitting</a>
+        </nav>
+      </div>
+    </div>
+    <Sticker src={stkAvatar} width={250} rotate={5} eager class="sv-intro-stk" data-float />
+  </section>
+
+  <Ticker items={ticker} tone="teal" tilt={1.1} direction="right" />
+
+  <!-- 01 · EDUCAZIONE -->
+  <section class="section-tight sv-section" id="educazione">
+    <div class="container">
+      <div class="svc-block" data-reveal>
+        <div class="svc-block-media parallax-cover">
+          <CoverImage src={educazionePhoto} alt="Irene e Luna sedute su un sentiero sopra il lago" />
+        </div>
+        <div class="svc-block-body">
+          <span class="svc-num">Consulenza 01</span>
+          <h2 class="svc-title">Educazione</h2>
+          <p>
+            <strong>Capire il tuo cane è il primo passo per una convivenza serena.</strong> Ti guido in
+            un percorso educativo per migliorare la relazione con il tuo amico a quattro zampe.
+          </p>
+          <div class="svc-tag-row">
+            <span class="pill">Cuccioli e adulti</span>
+            <span class="pill">Rispetto e fiducia</span>
+            <span class="pill pill-coral">Su misura</span>
+          </div>
+          <ul class="svc-includes">
+            <li>Un percorso costruito sul carattere e sulle esigenze del tuo cane</li>
+            <li>Ascolto attivo: niente “soluzione universale”</li>
+            <li>Ti guido passo dopo passo, adattando ogni lezione al tuo cane</li>
+          </ul>
+          <div class="hero-cta-row" style="margin-top:6px;">
+            <a class="btn" href="/contatti?servizio=educazione#scrivimi">Prenota una consulenza <ArrowIcon size={15} /></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 · ALIMENTAZIONE -->
+  <section class="section-tight sv-section" id="alimentazione">
+    <div class="container">
+      <div class="svc-block flip" data-reveal>
+        <div class="svc-block-media parallax-cover">
+          <CoverImage src={alimentazionePhoto} alt="Luna dietro la sua ciotola piena" />
+        </div>
+        <div class="svc-block-body">
+          <span class="svc-num">Consulenza 02</span>
+          <h2 class="svc-title">Alimentazione</h2>
+          <p>
+            <strong>Vuoi che il tuo cane mangi sano e in base alle sue esigenze reali?</strong> Ti aiuto
+            a creare un piano alimentare personalizzato, basato su età e stile di vita.
+          </p>
+          <div class="svc-tag-row">
+            <span class="pill">Età</span>
+            <span class="pill">Stile di vita</span>
+            <span class="pill pill-coral">Piano personalizzato</span>
+          </div>
+          <ul class="svc-includes">
+            <li>Compili il modulo con le informazioni sul tuo cane</li>
+            <li>Analizzo abitudini, età ed esigenze</li>
+            <li>Ricevi un piano alimentare pensato per lui</li>
+          </ul>
+          <div class="hero-cta-row" style="margin-top:6px;">
+            <a class="btn" href={NUTRITION_FORM_URL} target="_blank" rel="noopener">Compila il modulo <ArrowIcon size={15} /></a>
+            <a class="btn btn-ghost" href="/contatti?servizio=alimentazione#scrivimi">Prima una domanda</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <Sticker src={stkLunaMuso} width={150} rotate={-8} class="sv-peek sv-peek--r" data-float />
+  </section>
+
+  <!-- 03 · DOG-SITTING -->
+  <section class="section-tight sv-section" id="dog-sitting">
+    <div class="container">
+      <div class="svc-block" data-reveal>
+        <div class="svc-block-media parallax-cover">
+          <CoverImage src={dogSittingPhoto} alt="Irene abbraccia un cane bianco e nero, con il berretto di lana" />
+        </div>
+        <div class="svc-block-body">
+          <span class="svc-num">Consulenza 03</span>
+          <h2 class="svc-title">Dog-sitting</h2>
+          <p>
+            <strong>Hai un impegno o devi assentarti?</strong> Posso prendermi cura del tuo cane,
+            garantendogli passeggiate, attività stimolanti e tante attenzioni in un ambiente sicuro.
+          </p>
+          <div class="svc-tag-row">
+            <span class="pill">Passeggiate</span>
+            <span class="pill">Attività stimolanti</span>
+            <span class="pill pill-coral">Ambiente sicuro</span>
+          </div>
+          <div class="hero-cta-row" style="margin-top:6px;">
+            <a class="btn" href="/contatti?servizio=dog-sitting#scrivimi">Contattami <ArrowIcon size={15} /></a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <Sticker src={stkLunaPrato} width={130} rotate={6} class="sv-peek sv-peek--l" data-float />
+  </section>
+
+  <!-- COME FUNZIONA -->
+  <section class="section bg-deep paper-bg-deep edge-zigzag">
+    <div class="container">
+      <div class="head-block center" data-reveal>
+        <span class="eyebrow kicker-rule">Come funziona</span>
+        <h2 class="display-lg">Dal primo messaggio <span class="script">al vostro percorso.</span></h2>
+      </div>
+      <div class="principi" data-reveal data-delay="1">
+        <div class="principio">
+          <span class="pno">1</span>
+          <h3>Mi scrivi</h3>
+          <p>Dal modulo della pagina Contatti, per email o su Instagram: raccontami di te e del tuo cane.</p>
+        </div>
+        <div class="principio">
+          <span class="pno">2</span>
+          <h3>Ci conosciamo</h3>
+          <p>Ti ricontatto io per capire insieme carattere, abitudini ed esigenze del tuo cane.</p>
+        </div>
+        <div class="principio">
+          <span class="pno">3</span>
+          <h3>Iniziamo</h3>
+          <p>Un percorso su misura per voi due, passo dopo passo.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="section-tight">
+    <div class="container container-narrow">
+      <div class="cta-band">
+        <span class="eyebrow">Pronto a iniziare?</span>
+        <h2 class="display-md">Raccontami <span class="script">il tuo cane.</span></h2>
+        <div class="cta-row">
+          <a class="btn btn-lg" href="/contatti#scrivimi">Prenota una consulenza <ArrowIcon size={16} /></a>
+          <a class="btn btn-ghost btn-lg" href="/chi-sono">Chi sono</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</Base>

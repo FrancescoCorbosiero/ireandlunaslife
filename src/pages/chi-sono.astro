@@ -1,0 +1,271 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import ArrowIcon from '../components/ArrowIcon.astro';
+import Sticker from '../components/Sticker.astro';
+import { IG_HANDLE, IG_URL, SITE_NAME, SITE_TAGLINE, OWNER_NAME, TEAM_BRANCO_URL, CERTIFIED_SINCE } from '../config';
+import { assetImage } from '../lib/images';
+import selfiePhoto from '../assets/irene-luna-selfie.jpg';
+import heroPhoto from '../assets/hero.jpg';
+import bacioPhoto from '../assets/luna-bacio.jpg';
+import lagoPhoto from '../assets/irene-lago.jpg';
+import certificatoPhoto from '../assets/certificato.jpg';
+import stkLunaMuso from '../assets/stickers/luna-muso.webp';
+
+// Il ritratto dell'hero: src/assets/ritratto.jpg se c'è, altrimenti il selfie con Luna.
+const portrait = assetImage('ritratto') ?? selfiePhoto;
+const campoPhoto = assetImage('luna-campo') ?? heroPhoto;
+const natalePhoto = assetImage('luna-natale') ?? lagoPhoto;
+
+// Le polaroid del ventaglio (data-fan): l'ultima sta in cima alla pila.
+const polaroid = [
+  { src: lagoPhoto, alt: 'Irene e Luna sedute su un sentiero sopra il lago', caption: 'il nostro posto' },
+  { src: bacioPhoto, alt: 'Irene dà un bacio sul muso a Luna', caption: 'un bacio' },
+  { src: heroPhoto, alt: 'Irene e Luna sdraiate insieme sul pavimento', caption: 'felici e insieme' },
+];
+
+// Il percorso: un sentiero di impronte unisce le tappe (data-trail).
+const tappe = [
+  {
+    when: "L'inizio",
+    title: 'Rocky, il mio barboncino',
+    body: 'Volevo capire di più su di lui e aiutarlo nelle sue difficoltà, ma allora non parlavamo ancora la stessa lingua. Il suo ricordo mi ha guidata in questo percorso.',
+    tone: 'paper',
+  },
+  {
+    when: 'Il corso',
+    title: 'Arriva Luna',
+    body: 'Durante il corso incontro Luna, un’anima dolce che mi conquista fin da subito. Con lei ricomincio da capo: imparare, crescere, costruire un legame fatto di comprensione e fiducia.',
+    tone: 'mist',
+  },
+  {
+    when: `Dicembre ${CERTIFIED_SINCE}`,
+    title: 'Educatrice cinofila',
+    body: 'Il diploma di Educatore cinofilo e la certificazione APNEC. Da qui, il mio obiettivo: aiutare altri binomi a trovare la loro sintonia.',
+    tone: 'blush',
+  },
+  {
+    when: 'Con te',
+    title: 'Il prossimo passo',
+    body: 'Un percorso su misura per te e il tuo cane: educazione, alimentazione o dog-sitting.',
+    tone: 'coral',
+    link: { href: '/contatti#scrivimi', label: 'Prenota una consulenza' },
+  },
+];
+
+const PAW_D = [
+  { cx: 12, cy: 15, rx: 4.3, ry: 5.8 },
+  { cx: 21, cy: 10, rx: 4.3, ry: 6 },
+  { cx: 30, cy: 11, rx: 4.3, ry: 6 },
+  { cx: 38.5, cy: 16, rx: 4.3, ry: 5.6 },
+  { cx: 25, cy: 29, rx: 9.5, ry: 8 },
+];
+// La scheda Instagram: avatar, bio e un'anteprima di post che porta al profilo.
+const igHandle = IG_HANDLE.replace(/^@/, '');
+const w = (img: ImageMetadata, list: number[]) => [...new Set(list.map((x) => Math.min(x, img.width)))];
+---
+<Base
+  active="chi-sono"
+  ogType="article"
+  title={`Chi sono · ${SITE_NAME}`}
+  description="Sono Irene Bellapianta, educatrice cinofila certificata APNEC. La mia storia: da Rocky, il mio barboncino d'infanzia, a Luna, la mia compagna di avventure."
+  ogTitle={`Chi sono · ${SITE_NAME}`}
+  ogDescription="Da Rocky a Luna: come sono diventata educatrice cinofila."
+  ogImage="/assets/chi-sono.jpg"
+  ogImageAlt="Irene seduta accanto a Luna su una terrazza al tramonto"
+  ogImageWidth={1440}
+  ogImageHeight={1302}
+>
+  <!-- HERO: un biglietto da visita. Nome e ruolo in chiaro, la foto ad
+       arco, i fatti che contano, il sigillo APNEC e la firma a mano. -->
+  <section class="cs-hero" aria-labelledby="cs-title">
+    <div class="container cs-hero-grid">
+      <div class="cs-hero-copy">
+        <span class="eyebrow kicker-rule" data-intro style="--intro-d:0.05s;">Chi sono</span>
+        <h1 class="cs-title intro-lines" id="cs-title">
+          <span class="line"><span>Irene</span></span>
+          <span class="line"><span>Bellapianta</span></span>
+        </h1>
+        <p class="cs-role" data-intro style="--intro-d:0.5s;">
+          Educatrice cinofila certificata APNEC, con Luna sempre al fianco
+        </p>
+        <p class="lead" data-intro style="--intro-d:0.65s;">
+          Grazie a Luna, ai miei studi e alla passione che mi accompagna da sempre, oggi aiuto altri
+          binomi a trovare quella sintonia speciale che trasforma la relazione tra cane e proprietario.
+        </p>
+        <ul class="cs-creds" data-intro style="--intro-d:0.8s;">
+          <li><b>{CERTIFIED_SINCE}</b><span>diploma di educatrice cinofila</span></li>
+          <li><b>APNEC</b><span>certificazione professionale</span></li>
+          <li><b>Branco</b><span>parte del Team Branco</span></li>
+        </ul>
+        <div class="cs-ctas" data-intro style="--intro-d:0.95s;">
+          <a class="btn btn-lg" href="/contatti#scrivimi">
+            Prenota una consulenza <ArrowIcon size={16} />
+          </a>
+          <a class="btn btn-ghost-milk btn-lg" href="/consulenze">Le consulenze</a>
+        </div>
+      </div>
+      <!-- Parallax (data-speed) sul contenitore: la cornice ha la sua intro
+           CSS su scale e GSAP non deve leggerla a metà. -->
+      <figure class="cs-portrait" data-speed="0.06">
+        <div class="cs-portrait-frame">
+          <Image
+            src={portrait}
+            alt="Irene e Luna guancia a guancia, all'aperto"
+            widths={w(portrait, [480, 720, 960])}
+            sizes="(min-width: 900px) 450px, 84vw"
+            loading="eager"
+            fetchpriority="high"
+          />
+        </div>
+        <span class="cs-seal" aria-hidden="true">
+          <svg viewBox="0 0 200 200" data-spin>
+            <defs><path id="cs-seal-path" d="M100 100m-76 0a76 76 0 1 1 152 0a76 76 0 1 1-152 0"></path></defs>
+            <text><textPath href="#cs-seal-path" textLength="468" lengthAdjust="spacing">certificata APNEC · educatrice cinofila ·</textPath></text>
+          </svg>
+          <span class="cs-seal-core"><small>dal</small><b>{CERTIFIED_SINCE}</b></span>
+        </span>
+        <figcaption class="cs-sign">Irene &amp; Luna</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- BIO — le polaroid partono impilate e si aprono a ventaglio (data-fan) -->
+  <section class="section cs-bio" aria-labelledby="bio-title">
+    <div class="container">
+      <div class="cs-bio-head">
+        <div class="head-block">
+          <span class="eyebrow kicker-rule">Felici e insieme</span>
+          <h2 class="display-lg" id="bio-title">Siamo Irene <span class="script">e Luna.</span></h2>
+        </div>
+        <div class="cs-bio-text" data-reveal>
+          <p>
+            Il mio viaggio nella cinofilia è iniziato con Rocky, il mio barboncino d’infanzia. Volevo
+            capire di più su di lui, aiutarlo nelle sue difficoltà, ma allora non parlavamo ancora la
+            stessa lingua. Purtroppo se n’è andato prima che potessi trovare tutte le risposte, ma il
+            suo ricordo mi ha guidata in questo percorso.
+          </p>
+          <p>
+            Durante il mio corso ho incontrato Luna, un’anima dolce che mi ha conquistata fin da
+            subito. Con lei ho potuto iniziare da capo, imparare, crescere e costruire un legame fatto
+            di comprensione e fiducia.
+          </p>
+        </div>
+      </div>
+      <div class="cs-fan" data-fan>
+        {
+          polaroid.map((p, i) => (
+            <figure class={`cs-pol cs-pol--${i + 1}`} data-fan-item>
+              <Image src={p.src} alt={p.alt} widths={[360, 720]} sizes="(min-width: 900px) 340px, 50vw" loading="lazy" />
+              <figcaption>{p.caption}</figcaption>
+            </figure>
+          ))
+        }
+        <Sticker src={stkLunaMuso} width={128} rotate={-8} class="cs-fan-dog" data-float />
+      </div>
+      <blockquote class="cs-note" data-reveal>
+        <p>
+          «Non so cosa ci riserverà il futuro, ma una cosa è certa: continueremo a imparare,
+          migliorarci e camminare insieme.»
+        </p>
+      </blockquote>
+      <figure class="cs-cert" data-reveal>
+        <Image
+          src={certificatoPhoto}
+          alt="Il diploma di Educatore cinofilo conferito a Irene Bellapianta, Novate Milanese, 21 dicembre 2024"
+          widths={w(certificatoPhoto, [480, 900])}
+          sizes="(min-width: 900px) 520px, 90vw"
+          loading="lazy"
+        />
+        <figcaption>Il mio diploma di educatrice cinofila, dicembre {CERTIFIED_SINCE}</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- IL PERCORSO — le impronte percorrono il sentiero al passo con lo
+       scroll e accendono le tappe (data-trail). -->
+  <section class="section bg-plum cs-path" aria-labelledby="path-title">
+    <div class="container">
+      <div class="head-block">
+        <span class="eyebrow kicker-rule">Il percorso</span>
+        <h2 class="display-lg" id="path-title">Da Rocky <span class="script">a Luna.</span></h2>
+      </div>
+      <div class="trail" data-trail>
+        <svg class="trail-svg" data-trail-svg aria-hidden="true"><path data-trail-path></path></svg>
+        <div class="trail-paws" data-trail-paws aria-hidden="true"></div>
+        <ol class="trail-steps">
+          {
+            tappe.map((t, i) => (
+              <li class="trail-step" data-trail-step>
+                <span class="trail-dot" data-trail-stop aria-hidden="true">
+                  {i === tappe.length - 1 ? (
+                    <svg viewBox="0 0 24 22" fill="currentColor">
+                      <path d="M12 21.5S1.5 15 1.5 7.6C1.5 4 4.2 1.5 7.3 1.5c2 0 3.7 1 4.7 2.6 1-1.6 2.7-2.6 4.7-2.6 3.1 0 5.8 2.5 5.8 6.1C22.5 15 12 21.5 12 21.5Z" />
+                    </svg>
+                  ) : (
+                    <svg viewBox="0 0 50 44" fill="currentColor">
+                      {PAW_D.map((e) => (
+                        <ellipse cx={e.cx} cy={e.cy} rx={e.rx} ry={e.ry} />
+                      ))}
+                    </svg>
+                  )}
+                </span>
+                <div class={`trail-card tone-${t.tone}`}>
+                  <span class="trail-when">{t.when}</span>
+                  <h3>{t.title}</h3>
+                  <p>{t.body}</p>
+                  {t.link && (
+                    <a class="text-link" href={t.link.href}>
+                      {t.link.label} <ArrowIcon size={14} />
+                    </a>
+                  )}
+                </div>
+              </li>
+            ))
+          }
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA — foglio pesca e la scheda del profilo Instagram -->
+  <section class="cs-cta" aria-labelledby="cs-cta-title">
+    <div class="container cs-cta-grid">
+      <div class="cs-cta-copy">
+        <span class="eyebrow">Educazione · alimentazione · dog-sitting</span>
+        <h2 class="cs-cta-title" id="cs-cta-title" data-split="pop">
+          Raccontami il <span class="script">tuo cane.</span>
+        </h2>
+        <p class="lead">
+          Scrivimi e iniziamo a conoscerci. Nel frattempo, ci vediamo su Instagram.
+        </p>
+        <div class="cta-row">
+          <a class="btn btn-lg btn-dark" href="/contatti#scrivimi">Prenota una consulenza</a>
+          <a class="btn btn-ghost btn-lg" href={TEAM_BRANCO_URL} target="_blank" rel="noopener">Team Branco</a>
+        </div>
+      </div>
+      <aside class="ig-card" data-tilt aria-label="Il profilo Instagram di Irene e Luna">
+        <span class="cs-cta-note" aria-hidden="true">seguici!</span>
+        <div class="ig-head">
+          <span class="ig-avatar"><img src="/assets/logo.jpg" alt="" width="52" height="52" loading="lazy" decoding="async" /></span>
+          <span class="ig-id"><b>{igHandle}</b><small>{OWNER_NAME}</small></span>
+          <a class="btn btn-sm ig-follow" href={IG_URL} target="_blank" rel="noopener">Segui</a>
+        </div>
+        <p class="ig-bio">{SITE_TAGLINE}</p>
+        <a class="ig-grid" href={IG_URL} target="_blank" rel="noopener" aria-label={`Apri il profilo Instagram ${IG_HANDLE}`}>
+          <Image src={campoPhoto} alt="" widths={[160, 320]} sizes="128px" loading="lazy" />
+          <Image src={natalePhoto} alt="" widths={[160, 320]} sizes="128px" loading="lazy" />
+          <Image src={selfiePhoto} alt="" widths={[160, 320]} sizes="128px" loading="lazy" />
+        </a>
+        <div class="ig-foot">
+          <button type="button" class="ig-like" data-pet aria-label="Mi piace">
+            <svg viewBox="0 0 24 22" fill="currentColor" aria-hidden="true">
+              <path d="M12 21.5S1.5 15 1.5 7.6C1.5 4 4.2 1.5 7.3 1.5c2 0 3.7 1 4.7 2.6 1-1.6 2.7-2.6 4.7-2.6 3.1 0 5.8 2.5 5.8 6.1C22.5 15 12 21.5 12 21.5Z"></path>
+            </svg>
+          </button>
+          <span>Educazione, alimentazione e le avventure di tutti i giorni con Luna.</span>
+        </div>
+      </aside>
+    </div>
+  </section>
+</Base>

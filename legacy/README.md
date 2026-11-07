@@ -66,17 +66,8 @@ pesano 1–3,6 MB: vanno ricompressi (webp/avif responsive) nel nuovo sito.
 
 ## Indicazioni per il restyling
 
-Tenere l'**anima** (calda, ironica, personale, "Irene & Luna" come coppia) e cambiare tutto
-il resto. Per non assomigliare a comunicazionecinofila **evitare** quello che caratterizza
-quel sito:
-
-| comunicazionecinofila (da evitare) | direzione per ireandlunaslife |
-|---|---|
-| verdi salvia/bosco, pesca, sabbia | palette propria derivata dal sito attuale: corallo/terracotta, teal profondo, giallo sole, lilla come accento |
-| Bricolage Grotesque, Anton, Caveat | coppia nuova: un display tondo e simpatico (in linea con Coiny/Pacifico ma più leggibile) + un sans umanista per il testo |
-| superfici "vetro" smerigliato / timbri con ombre piene | forme morbide e organiche (blob come la macchia del logo), bordi arrotondati, niente vetro né ombre "stampate" |
-| tono autorevole, due imbuti (consulenza + Team) | tono da diario personale: storia di Irene e Luna al centro, servizi chiari, Team Branco come link secondario |
-| GSAP + Lenis con API ad attributi | animazioni più leggere e diverse (es. CSS scroll-driven / View Transitions) |
-
-Lo stack (Astro statico, content collections per blog ed eventi, deploy Docker/Netlify) si
-può riprendere senza problemi: è l'aspetto che deve cambiare, non l'architettura.
+> **Aggiornamento:** il nuovo sito usa come riferimento di stile il branch `template-bacheca`
+> di comunicazionecinofila (sticker, nastri, polaroid, ombre "a timbro"), con la codebase
+> testata su andreabellettati.it. Per non sembrare lo stesso sito cambiano palette (teal,
+> corallo, giallo, prugna/lilla), font (Lilita One, Nunito, Pacifico), foto, sticker e testi.
+> Vedi il README principale.

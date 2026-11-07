@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://ireandlunaslife.it/sitemap-index.xml

@@ -1,0 +1,254 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import ArrowIcon from '../components/ArrowIcon.astro';
+import WhatsAppIcon from '../components/WhatsAppIcon.astro';
+import InstagramIcon from '../components/InstagramIcon.astro';
+import Sticker from '../components/Sticker.astro';
+import Ticker from '../components/Ticker.astro';
+import teamBranco from '../assets/team-branco.png';
+import stkLunaPanchina from '../assets/stickers/luna-panchina.webp';
+import stkLunaMuso from '../assets/stickers/luna-muso.webp';
+import {
+  SITE_NAME,
+  HAS_WA,
+  WA_LINK,
+  PHONE_DISPLAY,
+  EMAIL,
+  IG_HANDLE,
+  IG_URL,
+  IG_PERSONAL_HANDLE,
+  IG_PERSONAL_URL,
+  TIKTOK_URL,
+  FACEBOOK_URL,
+  ETSY_URL,
+  TEAM_BRANCO_URL,
+  NUTRITION_FORM_URL,
+} from '../config';
+
+/* Contatti: il modulo "Scrivimi" in tre passi e, sotto, tutti i canali.
+   Senza numero WhatsApp (config.ts) il modulo arriva per email (AWS SES o
+   Netlify Forms, vedi FORM_ENDPOINT) con il ripiego mailto; con il numero
+   torna il flusso WhatsApp-first della codebase originale. */
+const ticker = ['Scrivimi', 'Educazione', 'Alimentazione', 'Dog-sitting', 'Ti rispondo io'];
+const servizi = ['Educazione', 'Alimentazione', 'Dog-sitting', 'Altro / non so ancora'];
+---
+<Base
+  active="contatti"
+  title={`Contatti · ${SITE_NAME}`}
+  description="Scrivi a Irene Bellapianta, educatrice cinofila APNEC: educazione, alimentazione su misura e dog-sitting. Modulo, email e Instagram."
+  ogTitle={`Contatti · ${SITE_NAME}`}
+  ogDescription="Hai domande? Non esitare a contattarmi!"
+  ogImage="/assets/og-home.jpg"
+  ogImageAlt="Irene e Luna sdraiate insieme sul pavimento"
+  ogImageWidth={1200}
+  ogImageHeight={630}
+>
+  <!-- HERO: invito + modulo in un solo schermo -->
+  <section class="c-hero" data-paw-trail data-sticky-from>
+    <div class="container c-hero-grid">
+      <div class="c-intro">
+        <span class="eyebrow kicker-rule" data-intro style="--intro-d:0.02s;">Contatti</span>
+        <h1 class="c-title intro-lines">
+          <span class="line"><span>Hai</span></span>
+          <span class="line"><span class="c-title-hl">domande?</span></span>
+        </h1>
+        <p class="lead" data-intro style="--intro-d:0.55s;">
+          Non esitare a contattarmi! Raccontami di te e del tuo cane: ti rispondo io, di persona.
+        </p>
+        <ol class="c-steps" data-intro style="--intro-d:0.7s;">
+          <li><b>1</b><span>Ti presenti<small>Come ti chiami.</small></span></li>
+          <li><b>2</b><span>Mi parli del tuo cane<small>E di cosa vorresti migliorare.</small></span></li>
+          <li><b>3</b><span>Ti ricontatto io<small>Per email, o come preferisci.</small></span></li>
+        </ol>
+        <Sticker src={stkLunaPanchina} width={260} rotate={-4} eager class="c-hero-dog" data-float />
+      </div>
+      <div class="c-form-wrap" id="scrivimi" data-intro="card" style="--intro-d:0.35s;">
+        <Sticker src={stkLunaMuso} width={104} rotate={6} eager class="c-form-dog" />
+        <span class="c-form-note" aria-hidden="true">tre passi, due minuti ↓</span>
+        <div class="form-card">
+          <form data-stepform novalidate name="scrivimi" method="POST" data-netlify="true" netlify-honeypot="bot-field">
+            <input type="hidden" name="form-name" value="scrivimi" />
+            <p class="hp-field" aria-hidden="true">
+              <label>Non compilare questo campo: <input name="bot-field" tabindex="-1" autocomplete="off" /></label>
+            </p>
+
+            <div class="steps-head">
+              <span class="step-dot"></span>
+              <span class="step-dot"></span>
+              <span class="step-dot"></span>
+            </div>
+
+            <!-- STEP 1 -->
+            <div class="step-panel active">
+              <span class="step-label">Passo 1 di 3</span>
+              <h2 class="step-q">Come ti chiami?</h2>
+              <div class="field">
+                <label for="f-nome">Nome e cognome</label>
+                <input id="f-nome" name="nome" type="text" autocomplete="name" placeholder="Es. Giulia Bianchi" required />
+                <span class="field-error">Scrivi il tuo nome per continuare.</span>
+              </div>
+              <div class="step-nav">
+                <span></span>
+                <button type="button" class="btn" data-next>Continua <ArrowIcon size={15} /></button>
+              </div>
+            </div>
+
+            <!-- STEP 2 -->
+            <div class="step-panel">
+              <span class="step-label">Passo 2 di 3</span>
+              <h2 class="step-q">Parlami del tuo cane.</h2>
+              <div class="field">
+                <label for="f-servizio">Di cosa hai bisogno?</label>
+                <select id="f-servizio" name="servizio" data-servizio required>
+                  <option value="" disabled selected>Scegli…</option>
+                  {servizi.map((s) => <option value={s}>{s}</option>)}
+                </select>
+                <span class="field-error">Scegli un'opzione: “Altro” va benissimo.</span>
+              </div>
+              <div class="field">
+                <label for="f-animale">Chi è e qual è la situazione</label>
+                <textarea
+                  id="f-animale"
+                  name="animale"
+                  rows="4"
+                  placeholder="Nome, razza, età. Cosa vorresti migliorare: passeggiate, richiamo, pappa, convivenza…"
+                  required></textarea>
+                <span class="field-error">Due righe bastano: mi aiutano a prepararmi.</span>
+              </div>
+              <p class="field-hint" data-nutrition-hint hidden>
+                Per il piano alimentare c'è anche il
+                <a class="text-link" href={NUTRITION_FORM_URL} target="_blank" rel="noopener">modulo dedicato</a>,
+                più dettagliato.
+              </p>
+              <div class="step-nav">
+                <button type="button" class="btn btn-ghost" data-prev>Indietro</button>
+                <button type="button" class="btn" data-next>Continua <ArrowIcon size={15} /></button>
+              </div>
+            </div>
+
+            <!-- STEP 3 -->
+            <div class="step-panel">
+              <span class="step-label">Passo 3 di 3</span>
+              <h2 class="step-q">Come ti ricontatto?</h2>
+              <div class="field">
+                <label for="f-email">Email</label>
+                <input id="f-email" name="email" type="email" autocomplete="email" placeholder="nome@esempio.it" required />
+                <span class="field-error">Serve un'email valida per risponderti.</span>
+              </div>
+              <div class="field">
+                <label for="f-tel">
+                  Telefono <span style="font-weight:400; color:var(--ink-mute);">(facoltativo)</span>
+                </label>
+                <input id="f-tel" name="telefono" type="tel" autocomplete="tel" placeholder="+39 3xx xxx xxxx" />
+              </div>
+              <div class="step-nav">
+                <button type="button" class="btn btn-ghost" data-prev>Indietro</button>
+                {
+                  HAS_WA ? (
+                    <button type="submit" class="btn">Invia su WhatsApp <WhatsAppIcon size={16} /></button>
+                  ) : (
+                    <button type="submit" class="btn">Invia <ArrowIcon size={15} /></button>
+                  )
+                }
+              </div>
+              <p class="field-hint">
+                {HAS_WA ? "Si apre WhatsApp con il messaggio già compilato." : 'Ti rispondo per email il prima possibile.'}
+              </p>
+              <div class="form-error" data-form-error role="alert">
+                Non sono riuscita a inviare il messaggio. Nessun problema:
+                <a class="text-link" data-error-mail href={`mailto:${EMAIL}`}>mandamelo per email</a>, è già compilato.
+              </div>
+            </div>
+
+            <!-- SUCCESS -->
+            <div class="form-success" role="status" tabindex="-1">
+              <span class="success-check">
+                <svg width="30" height="30" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M5 12.5 10 17 19 7" stroke="var(--milk-ink)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"></path>
+                </svg>
+              </span>
+              <h3 class="display-md">Ricevuto!</h3>
+              {
+                HAS_WA ? (
+                  <>
+                    <p style="max-width:420px;">
+                      Si è aperto WhatsApp con il tuo messaggio. Se non è successo, usa i pulsanti qui sotto.
+                    </p>
+                    <div class="hero-cta-row" style="justify-content:center;">
+                      <a class="btn" data-wa-out href="#" target="_blank" rel="noopener">Apri WhatsApp</a>
+                      <a class="btn btn-ghost" data-mail-out href="#">Invia per email</a>
+                    </div>
+                  </>
+                ) : (
+                  <p style="max-width:420px;">
+                    Grazie! Il tuo messaggio è arrivato: ti rispondo io il prima possibile. Intanto,
+                    passa a salutare Luna su <a class="text-link" href={IG_URL} target="_blank" rel="noopener">Instagram</a>.
+                  </p>
+                )
+              }
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <Ticker items={ticker} tone="ink" tilt={1.2} direction="right" />
+
+  <!-- CANALI -->
+  <section class="section c-channels" data-sticky-until>
+    <div class="container c-channels-grid">
+      <div class="c-channels-body">
+        <div class="head-block">
+          <span class="eyebrow kicker-rule">Tutti i modi per scrivermi</span>
+          <h2 class="display-lg">O semplicemente, <span class="script">scrivimi.</span></h2>
+          <p class="lead">Preferisci saltare il modulo? Scegli il canale che ti è più comodo.</p>
+        </div>
+        <div class="channel-list stagger" data-reveal>
+          <a class="channel" href={`mailto:${EMAIL}`}>
+            <span class="channel-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M3 6h18v12H3z" stroke="currentColor" stroke-width="1.6"></path>
+                <path d="m3 7 9 6 9-6" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"></path>
+              </svg>
+            </span>
+            <span class="channel-text"><b>Email</b><span>{EMAIL}</span></span>
+          </a>
+          <a class="channel" href={IG_URL} target="_blank" rel="noopener">
+            <span class="channel-icon"><InstagramIcon size={22} /></span>
+            <span class="channel-text"><b>Instagram</b><span>{IG_HANDLE}</span></span>
+          </a>
+          <a class="channel" href={IG_PERSONAL_URL} target="_blank" rel="noopener">
+            <span class="channel-icon"><InstagramIcon size={22} /></span>
+            <span class="channel-text"><b>Collaborazioni</b><span>{IG_PERSONAL_HANDLE}</span></span>
+          </a>
+          {
+            HAS_WA && (
+              <a class="channel" href={WA_LINK} target="_blank" rel="noopener">
+                <span class="channel-icon"><WhatsAppIcon size={22} /></span>
+                <span class="channel-text"><b>WhatsApp</b><span>{PHONE_DISPLAY}</span></span>
+              </a>
+            )
+          }
+        </div>
+        <ul class="c-socials" data-reveal aria-label="Altri profili">
+          <li><a class="pill" href={TIKTOK_URL} target="_blank" rel="noopener">TikTok</a></li>
+          <li><a class="pill" href={FACEBOOK_URL} target="_blank" rel="noopener">Facebook</a></li>
+          <li><a class="pill pill-coral" href={ETSY_URL} target="_blank" rel="noopener">Il negozio Etsy</a></li>
+        </ul>
+      </div>
+      <a class="team-card team-card--stack" href={TEAM_BRANCO_URL} target="_blank" rel="noopener" data-reveal>
+        <span class="team-logo">
+          <Image src={teamBranco} alt="Logo Team Branco" widths={[280, 560]} sizes="240px" loading="lazy" />
+        </span>
+        <span class="team-copy">
+          <span class="eyebrow">Faccio parte di</span>
+          <span class="team-title">Team Branco</span>
+          <span class="team-text">Scopri tutti i miei servizi sulla mia pagina del Team.</span>
+        </span>
+        <span class="door-go team-go">Vai a Team Branco <b><ArrowIcon size={22} /></b></span>
+      </a>
+    </div>
+  </section>
+</Base>

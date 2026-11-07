@@ -1,0 +1,104 @@
+---
+import { Image } from 'astro:assets';
+import {
+  SITE_NAME,
+  OWNER_NAME,
+  WA_LINK,
+  HAS_WA,
+  EMAIL,
+  PHONE,
+  PHONE_DISPLAY,
+  IG_HANDLE,
+  IG_URL,
+  IG_PERSONAL_HANDLE,
+  IG_PERSONAL_URL,
+  TIKTOK_URL,
+  FACEBOOK_URL,
+  ETSY_URL,
+  TEAM_BRANCO_URL,
+} from '../config';
+import WhatsAppIcon from './WhatsAppIcon.astro';
+import lunaMuso from '../assets/stickers/luna-muso.webp';
+
+const year = new Date().getFullYear();
+
+// Il wordmark gigante in fondo: ogni lettera nella sua maschera, così
+// motion.ts le fa salire una dopo l'altra (senza script resta fermo).
+// Gli spazi diventano spazi non divisibili, se no la maschera li schiaccia.
+const wordmark = ['ire & luna’s', 'life'];
+---
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <a class="footer-lockup" href="/">
+          <span class="pp">
+            <img src="/assets/logo.jpg" alt="Irene e Luna disegnate in stile cartoon" width="52" height="52" loading="lazy" />
+          </span>
+          <span class="n">{SITE_NAME}</span>
+        </a>
+        <p>
+          {OWNER_NAME}, educatrice cinofila certificata APNEC. Educazione, alimentazione e
+          dog-sitting, con Luna sempre in prima fila.
+        </p>
+        <div class="footer-ctas">
+          <a class="btn btn-milk btn-sm" href="/contatti#scrivimi">Contattami</a>
+          {
+            HAS_WA ? (
+              <a class="btn btn-ghost-milk btn-sm" href={WA_LINK} target="_blank" rel="noopener">
+                <WhatsAppIcon size={15} /> WhatsApp
+              </a>
+            ) : (
+              <a class="btn btn-ghost-milk btn-sm" href={TEAM_BRANCO_URL} target="_blank" rel="noopener">
+                Team Branco
+              </a>
+            )
+          }
+        </div>
+      </div>
+      <div class="footer-cols">
+        <div class="footer-col">
+          <h5>Sito</h5>
+          <a href="/">Home</a>
+          <a href="/chi-sono">Chi sono</a>
+          <a href="/consulenze">Consulenze</a>
+          <a href="/blog">Blog</a>
+          <a href="/contatti">Contatti</a>
+          <a href="/rss.xml">Feed RSS</a>
+        </div>
+        <div class="footer-col">
+          <h5>Seguici</h5>
+          <a href={IG_URL} target="_blank" rel="noopener">Instagram {IG_HANDLE}</a>
+          <a href={IG_PERSONAL_URL} target="_blank" rel="noopener">Irene {IG_PERSONAL_HANDLE}</a>
+          <a href={TIKTOK_URL} target="_blank" rel="noopener">TikTok</a>
+          <a href={FACEBOOK_URL} target="_blank" rel="noopener">Facebook</a>
+          <a href={ETSY_URL} target="_blank" rel="noopener">Il negozio Etsy</a>
+        </div>
+        <div class="footer-col">
+          <h5>Contatti</h5>
+          <a href={`mailto:${EMAIL}`}>{EMAIL}</a>
+          {HAS_WA && <a href={`tel:${PHONE}`}>{PHONE_DISPLAY}</a>}
+          <a href={TEAM_BRANCO_URL} target="_blank" rel="noopener">Team Branco</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="foot-wordmark" aria-hidden="true" data-wordmark>
+    <span class="foot-dog" data-foot-dog>
+      <Image src={lunaMuso} alt="" widths={[160, 320]} sizes="150px" loading="lazy" />
+    </span>
+    {
+      wordmark.map((word) => (
+        <span class="foot-row">
+          {word.split('').map((ch) => (
+            <span class="foot-char">{ch === ' ' ? ' ' : ch}</span>
+          ))}
+        </span>
+      ))
+    }
+  </div>
+  <div class="container footer-bottom">
+    <span>© {year} {OWNER_NAME} · {SITE_NAME}</span>
+    <span>Educazione cinofila · Alimentazione · Dog-sitting</span>
+  </div>
+</footer>

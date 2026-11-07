@@ -1,0 +1,482 @@
+---
+import { getCollection } from 'astro:content';
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import ArrowIcon from '../components/ArrowIcon.astro';
+import WhatsAppIcon from '../components/WhatsAppIcon.astro';
+import InstagramIcon from '../components/InstagramIcon.astro';
+import ArticleCard from '../components/ArticleCard.astro';
+import Sticker from '../components/Sticker.astro';
+import Ticker from '../components/Ticker.astro';
+import heroPhoto from '../assets/hero.jpg';
+import aboutPhoto from '../assets/chi-sono.jpg';
+import ciotolaPhoto from '../assets/luna-ciotola.jpg';
+import lagoPhoto from '../assets/irene-lago.jpg';
+import teamBranco from '../assets/team-branco.png';
+import stkLunaPrato from '../assets/stickers/luna-prato.webp';
+import stkLunaPanchina from '../assets/stickers/luna-panchina.webp';
+import stkLunaMuso from '../assets/stickers/luna-muso.webp';
+import stkSelfie from '../assets/stickers/irene-luna-selfie.webp';
+import { assetImage } from '../lib/images';
+import {
+  SITE_NAME,
+  IG_URL,
+  IG_HANDLE,
+  HAS_WA,
+  waLink,
+  TEAM_BRANCO_URL,
+  CERTIFIED_SINCE,
+} from '../config';
+
+/* Home: una pagina sola con un compito solo, far conoscere Irene e Luna e
+   portare alla consulenza. Ordine: promessa e CTA → scegli il percorso →
+   chi siamo → come ragiono → come si inizia → la bacheca di Luna → blog →
+   Team Branco → CTA. Struttura e coreografie vengono dalla "bacheca" di
+   comunicazionecinofila; testi e foto sono quelli veri di Irene. */
+
+// Blog: gli ultimi tre articoli con pagina di dettaglio, più il rimando all'indice.
+const articoli = await getCollection('articoli');
+const latestArticoli = articoli
+  .filter((a) => a.data.status === 'published' && !a.data.externalUrl)
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
+  .slice(0, 3);
+const nArticoli = articoli.filter((a) => a.data.status === 'published').length;
+
+const ticker = ['Educatrice cinofila APNEC', 'Educazione', 'Alimentazione su misura', 'Dog-sitting', 'Irene & Luna'];
+
+// "Come iniziamo": quattro passi, dal primo messaggio al percorso.
+const passi = [
+  {
+    title: 'Mi scrivi',
+    body: 'Raccontami di te e del tuo cane: dal modulo, per email o su Instagram.',
+    icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5h16v13H4z"/><path d="m4 6.5 8 6 8-6"/></svg>',
+  },
+  {
+    title: 'Ci conosciamo',
+    body: 'Capisco carattere, abitudini ed esigenze del tuo cane.',
+    icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5h11a2 2 0 012 2v5a2 2 0 01-2 2H9l-4 3.5v-3.5H4a2 2 0 01-2-2v-5a2 2 0 012-2z"/><path d="M19 9.5h1a2 2 0 012 2V16a2 2 0 01-2 2h-1v3l-3.5-3H12"/></svg>',
+  },
+  {
+    title: 'Il vostro percorso',
+    body: 'Costruito su misura per voi due: niente soluzioni universali.',
+    icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19c3-6 4-9 7-9s4 4 7 4"/><circle cx="5" cy="19" r="1.6"/><circle cx="19" cy="14" r="1.6"/><path d="M12 4v3M10.5 5.5h3"/></svg>',
+  },
+  {
+    title: 'Crescete insieme',
+    body: 'Passo dopo passo, adattando ogni lezione al tuo cane.',
+    icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20s-7-4.4-7-10a4 4 0 017-2.6A4 4 0 0119 10c0 5.6-7 10-7 10z"/></svg>',
+  },
+];
+
+// La bacheca: le foto di Luna appese con lo scotch (src/assets/luna-*.jpg).
+const bacheca = [
+  { name: 'luna-campo', caption: 'a tutta velocità', alt: 'Luna corre in un campo di erba alta' },
+  { name: 'luna-natale', caption: 'buone feste!', alt: "Luna davanti all'albero di Natale illuminato" },
+  { name: 'luna-panchina', caption: 'posa da modella', alt: 'Luna sdraiata su una panchina dipinta a fiori' },
+  { name: 'luna-bacio', caption: 'un bacio', alt: 'Irene dà un bacio sul muso a Luna' },
+  { name: 'luna-ritratto', caption: 'chi, io?', alt: 'Luna guarda in camera da vicino' },
+  { name: 'luna-erba', caption: 'relax', alt: "Luna seduta sull'erba" },
+]
+  .map((b) => ({ ...b, img: assetImage(b.name) }))
+  .filter((b): b is typeof b & { img: ImageMetadata } => Boolean(b.img));
+
+const PAW_D = [
+  { cx: 12, cy: 15, rx: 4.3, ry: 5.8 },
+  { cx: 21, cy: 10, rx: 4.3, ry: 6 },
+  { cx: 30, cy: 11, rx: 4.3, ry: 6 },
+  { cx: 38.5, cy: 16, rx: 4.3, ry: 5.6 },
+  { cx: 25, cy: 29, rx: 9.5, ry: 8 },
+];
+const w = (img: ImageMetadata, list: number[]) => [...new Set(list.map((x) => Math.min(x, img.width)))];
+---
+<Base
+  active="home"
+  title={`${SITE_NAME} · Irene Bellapianta, educatrice cinofila`}
+  description="Irene Bellapianta, educatrice cinofila certificata APNEC: educazione, alimentazione su misura e dog-sitting. Con Luna, sempre al mio fianco."
+  ogTitle={`${SITE_NAME} · Parliamo la stessa lingua`}
+  ogDescription="Educazione, alimentazione su misura e dog-sitting, per trovare la sintonia giusta con il tuo cane."
+  ogImage="/assets/og-home.jpg"
+  ogImageAlt="Irene e Luna sdraiate insieme sul pavimento"
+  ogImageWidth={1200}
+  ogImageHeight={630}
+>
+  <!-- HERO: testo a sinistra, il disco con la foto di Irene e Luna a destra,
+       il nastro dei servizi che gira sull'anello, Luna-sticker che ne esce. -->
+  <section class="hm-hero hm-hero--lagoon" data-paw-trail data-sticky-from aria-labelledby="hm-title">
+    <div class="container hm-hero-grid">
+      <div class="hm-hero-copy">
+        <span class="eyebrow kicker-rule" data-intro style="--intro-d:0.05s;">Educatrice cinofila · nutrizione</span>
+        <h1 class="hm-title intro-lines" id="hm-title">
+          <span class="line"><span>Parliamo la</span></span>
+          <span class="line">
+            <span class="hm-title-hl"
+              >stessa lingua.<svg class="hm-underline" viewBox="0 0 300 24" preserveAspectRatio="none" aria-hidden="true"
+                ><path d="M4 15c46-9 92-12 142-8s96 6 150-3" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round" pathLength="1"
+                ></path></svg
+              ></span
+            >
+          </span>
+        </h1>
+        <p class="lead hm-lead" data-intro style="--intro-d:0.65s;">
+          Sono Irene, educatrice cinofila certificata APNEC. Con Luna al mio fianco aiuto te e il tuo
+          cane a trovare quella sintonia speciale che trasforma la relazione.
+        </p>
+        <div class="hm-ctas" data-intro style="--intro-d:0.8s;">
+          <a class="btn btn-lg" href="/contatti#scrivimi">
+            Prenota una consulenza <ArrowIcon size={16} />
+          </a>
+          <a class="btn btn-ghost btn-lg" href="/consulenze">Le consulenze</a>
+        </div>
+        <ul class="hm-facts" data-intro style="--intro-d:0.95s;">
+          <li>Certificata APNEC</li>
+          <li>Percorsi su misura</li>
+          <li>Con Luna, sempre</li>
+        </ul>
+      </div>
+
+      <div class="hm-hero-visual">
+        <div class="hm-disc-wrap" data-speed="0.08">
+          <div class="hm-disc">
+            <div class="hm-disc-photo">
+              <Image
+                src={heroPhoto}
+                alt="Irene sorride sdraiata sul pavimento accanto a Luna"
+                widths={w(heroPhoto, [360, 540, 720])}
+                sizes="(min-width: 900px) 400px, 70vw"
+                loading="eager"
+                fetchpriority="high"
+              />
+            </div>
+            <svg class="hm-disc-ring" viewBox="0 0 200 200" data-spin aria-hidden="true">
+              <defs><path id="hm-ring-path" d="M100 100m-87 0a87 87 0 1 1 174 0a87 87 0 1 1-174 0"></path></defs>
+              <text><textPath href="#hm-ring-path" textLength="540" lengthAdjust="spacing">educazione · alimentazione · dog-sitting ·</textPath></text>
+            </svg>
+          </div>
+        </div>
+        <div class="hm-stk-wrap" data-speed="-0.06" aria-hidden="true">
+          <Sticker src={stkLunaPanchina} width={300} rotate={-4} eager class="hm-hero-stk" />
+        </div>
+        <span class="hm-stamp" aria-hidden="true">APNEC</span>
+        <span class="hm-note" aria-hidden="true">ciao da Ire &amp; Luna!</span>
+        <svg class="hm-arrow" viewBox="0 0 90 110" aria-hidden="true"
+          ><path d="M10 6c34 6 58 34 62 88" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" pathLength="1"
+          ></path><path d="M58 82l14 14 10-17" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" pathLength="1"
+          ></path></svg
+        >
+      </div>
+    </div>
+  </section>
+
+  <Ticker items={ticker} tone="coral" tilt={-1.2} />
+
+  <!-- LE TRE PORTE: i tre servizi, subito dopo la promessa. -->
+  <section class="section hm-doors" aria-labelledby="doors-title">
+    <div class="container">
+      <div class="head-block">
+        <span class="eyebrow kicker-rule">Da dove partiamo?</span>
+        <h2 class="display-lg" id="doors-title">Scegli il tuo <span class="script">percorso.</span></h2>
+      </div>
+      <div class="doors doors--3 stagger" data-reveal>
+        <a class="door door--care" href="/consulenze#educazione">
+          <span class="eyebrow">Per la vostra relazione</span>
+          <h3>Educazione</h3>
+          <p>Capire il tuo cane è il primo passo per una convivenza serena.</p>
+          <ul class="door-list">
+            <li>Un percorso educativo su misura</li>
+            <li>Per cuccioli e cani adulti</li>
+          </ul>
+          <span class="door-go">Scopri di più <b><ArrowIcon size={22} /></b></span>
+          <svg class="door-paw" viewBox="0 0 50 44" fill="currentColor" aria-hidden="true">
+            {PAW_D.map((e) => <ellipse cx={e.cx} cy={e.cy} rx={e.rx} ry={e.ry} />)}
+          </svg>
+        </a>
+        <a class="door door--work" href="/consulenze#alimentazione">
+          <span class="eyebrow">Per la sua ciotola</span>
+          <h3>Alimentazione</h3>
+          <p>Vuoi che il tuo cane mangi sano e in base alle sue esigenze reali?</p>
+          <ul class="door-list">
+            <li>Piano alimentare personalizzato</li>
+            <li>Basato su età e stile di vita</li>
+          </ul>
+          <span class="door-go">Scopri di più <b><ArrowIcon size={22} /></b></span>
+          <svg class="door-paw" viewBox="0 0 50 44" fill="currentColor" aria-hidden="true">
+            {PAW_D.map((e) => <ellipse cx={e.cx} cy={e.cy} rx={e.rx} ry={e.ry} />)}
+          </svg>
+        </a>
+        <a class="door door--sit" href="/consulenze#dog-sitting">
+          <span class="eyebrow">Quando non ci sei</span>
+          <h3>Dog-sitting</h3>
+          <p>Hai un impegno o devi assentarti? Mi prendo cura io del tuo cane.</p>
+          <ul class="door-list">
+            <li>Passeggiate e attività stimolanti</li>
+            <li>Tante attenzioni, in un ambiente sicuro</li>
+          </ul>
+          <span class="door-go">Scopri di più <b><ArrowIcon size={22} /></b></span>
+          <svg class="door-paw" viewBox="0 0 50 44" fill="currentColor" aria-hidden="true">
+            {PAW_D.map((e) => <ellipse cx={e.cx} cy={e.cy} rx={e.rx} ry={e.ry} />)}
+          </svg>
+        </a>
+      </div>
+      <p class="doors-more" data-reveal>
+        Vuoi prima conoscerci?
+        <a class="text-link" href="/chi-sono">Leggi la nostra storia <ArrowIcon size={14} /></a>
+      </p>
+    </div>
+  </section>
+
+  <!-- CHI SIAMO: Irene e Luna, con i fatti (non numeri gonfiati). -->
+  <section class="section hm-about" aria-labelledby="about-title">
+    <div class="container hm-about-grid">
+      <div class="hm-about-media">
+        <div class="hm-arch" data-clip>
+          <Image
+            src={aboutPhoto}
+            alt="Irene seduta accanto a Luna su una terrazza al tramonto"
+            widths={w(aboutPhoto, [480, 720])}
+            sizes="(min-width: 900px) 440px, 80vw"
+            loading="lazy"
+          />
+        </div>
+        <figure class="polaroid hm-about-pol" data-speed="0.16">
+          <Image src={ciotolaPhoto} alt="Luna dietro la sua ciotola piena" widths={w(ciotolaPhoto, [240, 480])} sizes="220px" loading="lazy" />
+          <figcaption>la pappa!</figcaption>
+        </figure>
+      </div>
+      <div class="hm-about-copy">
+        <div class="head-block">
+          <span class="eyebrow kicker-rule">Chi siamo</span>
+          <h2 class="display-lg" id="about-title">Ciao, siamo <span class="script">Irene e Luna.</span></h2>
+        </div>
+        <p class="lead">
+          Il mio viaggio nella cinofilia è iniziato con Rocky, il mio barboncino d’infanzia. Volevo
+          capirlo e aiutarlo, ma allora non parlavamo ancora la stessa lingua.
+        </p>
+        <p>
+          Durante il mio corso ho incontrato Luna, un’anima dolce che mi ha conquistata fin da subito.
+          Con lei ho potuto ricominciare da capo, imparare, crescere e costruire un legame fatto di
+          comprensione e fiducia.
+        </p>
+        <ul class="hm-stats" data-reveal>
+          <li><b data-count={CERTIFIED_SINCE} data-count-from="2000">{CERTIFIED_SINCE}</b><span>diploma di educatrice cinofila</span></li>
+          <li><b>APNEC</b><span>certificazione professionale</span></li>
+          <li><b>4</b><span>zampe sempre al mio fianco</span></li>
+        </ul>
+        <div class="hm-about-links">
+          <a class="btn" href="/chi-sono">Conosci la nostra storia <ArrowIcon size={15} /></a>
+          <a class="text-link" href={IG_URL} target="_blank" rel="noopener">Seguici su Instagram <ArrowIcon size={14} /></a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- L'APPROCCIO: la frase si accende parola per parola con lo scroll -->
+  <section class="statement-band" aria-labelledby="st-title">
+    <Sticker src={stkLunaPrato} width={160} rotate={6} class="st-stk st-stk--a" data-speed="0.5" />
+    <Sticker src={stkLunaMuso} width={130} rotate={-9} class="st-stk st-stk--b" data-float />
+    <div class="container">
+      <span class="eyebrow kicker-rule">Il mio approccio</span>
+      <h2 class="statement" id="st-title" data-scrub>
+        Ogni cane ha il suo carattere, le sue difficoltà e le sue risorse. Non esiste una soluzione
+        universale: esiste il vostro percorso.
+      </h2>
+      <div class="statement-foot">
+        <figure class="polaroid" data-speed="-0.25">
+          <Image src={lagoPhoto} alt="Irene e Luna sedute su un sentiero sopra il lago" widths={w(lagoPhoto, [320, 640])} sizes="300px" loading="lazy" />
+          <figcaption>in cammino, insieme</figcaption>
+        </figure>
+        <div class="statement-copy" data-reveal>
+          <p>
+            Credo che ogni cane meriti un’educazione basata sul rispetto, sulla comprensione e su un
+            legame profondo con il proprio umano.
+          </p>
+          <p>
+            <strong>Per questo parto dall’individualità e dall’ascolto attivo</strong>, per costruire
+            percorsi personalizzati e su misura per ciascun cane.
+          </p>
+          <ul class="st-values" aria-label="I miei valori">
+            <li>Rispetto</li>
+            <li>Fiducia</li>
+            <li>Ascolto</li>
+            <li>Pazienza</li>
+          </ul>
+          <div class="statement-links">
+            <a class="btn btn-milk" href="/consulenze">Le consulenze <ArrowIcon size={15} /></a>
+            <a class="btn btn-ghost-milk" href="/blog">Leggi il blog</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- COME INIZIAMO: quattro passi su un binario che si riempie con lo
+       scroll; la zampina lo percorre (data-rail). -->
+  <section class="section bg-plum hm-how" aria-labelledby="how-title">
+    <div class="container">
+      <div class="head-block">
+        <span class="eyebrow kicker-rule">Come iniziamo</span>
+        <h2 class="display-lg" id="how-title">Dal primo messaggio, <span class="script">passo dopo passo.</span></h2>
+      </div>
+      <div class="how-rail" data-rail>
+        <span class="how-line" aria-hidden="true">
+          <span class="how-fill"></span>
+          <span class="how-walker">
+            <svg viewBox="0 0 50 44" fill="currentColor">
+              {PAW_D.map((e) => <ellipse cx={e.cx} cy={e.cy} rx={e.rx} ry={e.ry} />)}
+            </svg>
+          </span>
+        </span>
+        <ol class="how-steps">
+          {
+            passi.map((p, i) => (
+              <li class="how-step" data-rail-step>
+                <span class="how-dot" aria-hidden="true" set:html={p.icon} />
+                <div class="how-text">
+                  <span class="how-n">{String(i + 1).padStart(2, '0')}</span>
+                  <h3>{p.title}</h3>
+                  <p>{p.body}</p>
+                </div>
+              </li>
+            ))
+          }
+        </ol>
+      </div>
+      <div class="hm-how-foot" data-reveal>
+        <a class="btn btn-lg" href="/contatti#scrivimi">Scrivimi <ArrowIcon size={16} /></a>
+        <span class="hm-how-note">Educazione · alimentazione · dog-sitting</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- LA BACHECA: le foto di Luna appese con lo scotch, ognuna storta a modo
+       suo. Su telefono scorrono di lato. -->
+  {
+    bacheca.length > 0 && (
+      <section class="section hm-board" aria-labelledby="board-title">
+        <div class="container hm-board-head">
+          <div class="head-block">
+            <span class="eyebrow kicker-rule">La bacheca</span>
+            <h2 class="display-lg" id="board-title">
+              Le giornate di <span class="script">Luna.</span>
+            </h2>
+            <p class="lead">Le avventure di tutti i giorni: le altre sono su Instagram.</p>
+          </div>
+          <a class="btn btn-ghost" href={IG_URL} target="_blank" rel="noopener">
+            <InstagramIcon size={16} /> {IG_HANDLE}
+          </a>
+        </div>
+        <ul class="board stagger" data-reveal>
+          {bacheca.map((b, i) => (
+            <li class="board-item" style={`--i:${i}`}>
+              <figure class="polaroid board-pol">
+                <Image src={b.img} alt={b.alt} widths={w(b.img, [300, 600])} sizes="(min-width: 900px) 280px, 62vw" loading="lazy" />
+                <figcaption>{b.caption}</figcaption>
+              </figure>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )
+  }
+
+  <!-- BLOG: gli ultimi articoli in griglia su desktop, carosello su telefono. -->
+  {
+    latestArticoli.length > 0 && (
+      <section class="h-blog h-blog--grid" aria-labelledby="blog-title">
+        <div class="container h-blog-head">
+          <div class="head-block">
+            <span class="eyebrow kicker-rule">Dal blog</span>
+            <h2 class="display-lg" id="blog-title">
+              Racconti a
+              <br />
+              <span class="script">quattro zampe.</span>
+            </h2>
+          </div>
+          <a class="btn btn-ghost" href="/blog">
+            Tutti gli articoli <ArrowIcon size={15} />
+          </a>
+        </div>
+        <div class="hs-viewport">
+          <div class="hs-track stagger" data-reveal>
+            {latestArticoli.map((entry) => (
+              <div class="hs-item">
+                <ArticleCard entry={entry} />
+              </div>
+            ))}
+            <a class="hs-item hs-more" href="/blog">
+              <span class="hs-more-n">{nArticoli}</span>
+              <span class="hs-more-t">{nArticoli === 1 ? 'articolo, e altri in arrivo' : 'articoli per crescere con il tuo cane'}</span>
+              <span class="hs-more-cta">
+                Vai al blog <ArrowIcon size={18} />
+              </span>
+            </a>
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  <!-- TEAM BRANCO: il gruppo di professionisti di cui Irene fa parte. -->
+  <section class="section-tight hm-team" aria-labelledby="team-title">
+    <div class="container">
+      <a class="team-card" href={TEAM_BRANCO_URL} target="_blank" rel="noopener" data-reveal>
+        <span class="team-logo">
+          <Image src={teamBranco} alt="Logo Team Branco" widths={[280, 560]} sizes="240px" loading="lazy" />
+        </span>
+        <span class="team-copy">
+          <span class="eyebrow">Faccio parte di</span>
+          <span class="team-title" id="team-title">Team Branco</span>
+          <span class="team-text">Scopri tutti i miei servizi sulla mia pagina del Team.</span>
+        </span>
+        <span class="door-go team-go">Vai a Team Branco <b><ArrowIcon size={22} /></b></span>
+      </a>
+    </div>
+  </section>
+
+  <!-- CTA: foglio corallo, badge che gira, Irene e Luna che spuntano dal fondo -->
+  <section class="h-cta" data-sticky-until aria-labelledby="cta-title">
+    <div class="container h-cta-inner">
+      <span class="eyebrow">Sei pronto?</span>
+      <h2 class="h-cta-title" id="cta-title" data-split="pop">
+        Iniziamo insieme <span class="script">questo viaggio.</span>
+      </h2>
+      <p class="lead">
+        Se vuoi migliorare il rapporto con il tuo cane e costruire una relazione fatta di fiducia,
+        rispetto e comprensione, sono qui per aiutarti.
+      </p>
+      <div class="cta-row">
+        <a class="btn btn-lg btn-dark" href="/contatti#scrivimi">Prenota una consulenza <ArrowIcon size={16} /></a>
+        {
+          HAS_WA ? (
+            <a class="btn btn-ghost btn-lg" href={waLink('Ciao Irene! Vorrei informazioni su una consulenza.')} target="_blank" rel="noopener">
+              <WhatsAppIcon size={16} /> Scrivimi su WhatsApp
+            </a>
+          ) : (
+            <a class="btn btn-ghost btn-lg" href={IG_URL} target="_blank" rel="noopener">
+              <InstagramIcon size={16} /> Scrivici su Instagram
+            </a>
+          )
+        }
+      </div>
+      <a class="spin-badge" href="/contatti#scrivimi" data-magnetic aria-label="Contattami: educazione, alimentazione, dog-sitting">
+        <svg class="spin-ring" viewBox="0 0 200 200" aria-hidden="true" data-spin>
+          <defs><path id="spin-path" d="M100 100m-78 0a78 78 0 1 1 156 0a78 78 0 1 1-156 0"></path></defs>
+          <text><textPath href="#spin-path" textLength="486" lengthAdjust="spacing">educazione · alimentazione · dog-sitting ·</textPath></text>
+        </svg>
+        <span class="spin-core" aria-hidden="true"><ArrowIcon size={30} /></span>
+      </a>
+    </div>
+    <!-- Irene e Luna spuntano dal fondo: l'ultima cosa che vedi prima di
+         scrivere è una faccia, non un bottone. Si accarezzano (data-pet). -->
+    <div class="h-cta-peek" data-peek data-pet aria-hidden="true">
+      <Image src={stkSelfie} alt="" widths={[360, 720]} sizes="(min-width: 900px) 340px, 56vw" loading="lazy" />
+    </div>
+  </section>
+
+  <!-- CTA fissa: compare dopo l'hero, sparisce sulla CTA finale -->
+  <a class="sticky-cta" href="/contatti#scrivimi" data-sticky-cta data-no-roll>
+    <span class="sticky-cta-dot" aria-hidden="true"></span>
+    <span class="sticky-cta-full">Prenota una consulenza</span>
+    <span class="sticky-cta-short">Contattami</span>
+    <ArrowIcon size={16} />
+  </a>
+</Base>

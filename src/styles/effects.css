@@ -1,0 +1,58 @@
+/* =====================================================================
+   Effetti: parallax + rifiniture per le View Transitions.
+   Tutto è disattivato quando l'utente preferisce meno movimento.
+   ===================================================================== */
+
+@media (prefers-reduced-motion: no-preference) {
+  [data-parallax] {
+    will-change: transform;
+  }
+  /* I contenitori cover nascondono l'eccedenza; l'immagine è pre-scalata
+     così la traslazione del parallax non scopre mai i bordi. */
+  .parallax-cover {
+    overflow: hidden;
+  }
+  .parallax-cover > img {
+    transform: scale(1.24);
+    transform-origin: center;
+  }
+}
+
+/* View Transitions (Astro ClientRouter): crossfade un filo più morbido. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.5s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}
+
+/* ── Accessibilità con carattere ── */
+.skip-link {
+  position: fixed; top: 10px; left: 10px; z-index: 100;
+  background: var(--coral); color: var(--petrol-darkest);
+  padding: 12px 20px; border-radius: var(--r-pill);
+  font-weight: 700; font-size: 14px;
+  transform: translateY(-72px); transition: transform 0.2s ease;
+}
+.skip-link:focus { transform: none; }
+a:focus-visible, button:focus-visible, .cal-slot:focus-visible {
+  outline: 2px solid var(--coral-deep);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* ── Header su telefoni stretti: il nome cede prima delle icone ── */
+.header-cta {
+  flex-shrink: 0;
+}
+@media (max-width: 360px) {
+  .lockup-name {
+    font-size: 16px;
+  }
+}

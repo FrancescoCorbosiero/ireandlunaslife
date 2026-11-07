@@ -1,0 +1,152 @@
+/* =====================================================================
+   Tipografia dei contenuti Markdown (dettaglio articoli/eventi).
+   Tiene il corpo leggibile, con i titoli in chiave brand (Anton).
+   ===================================================================== */
+.prose {
+  font-size: 17px;
+  line-height: 1.75;
+  color: var(--ink-soft);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  max-width: 720px;
+}
+.prose > :first-child { margin-top: 0; }
+/* Le ancore dell'indice non finiscono sotto l'header sticky */
+.prose :is(h2, h3) { scroll-margin-top: 96px; }
+/* Capolettera editoriale sul primo paragrafo */
+.prose > p:first-of-type::first-letter {
+  font-family: var(--display);
+  float: left;
+  font-size: 3.4em;
+  line-height: 0.82;
+  padding: 5px 12px 0 0;
+  color: var(--coral-deep);
+}
+.prose h2 {
+  font-family: var(--display);
+  text-transform: uppercase;
+  letter-spacing: 0.005em;
+  font-size: clamp(24px, 4vw, 32px);
+  line-height: 1.06;
+  color: var(--petrol-darkest);
+  margin: 16px 0 0;
+}
+.prose h3 {
+  font-family: var(--display);
+  text-transform: uppercase;
+  font-size: 20px;
+  color: var(--petrol);
+  margin: 12px 0 0;
+}
+.prose p { margin: 0; }
+.prose ul,
+.prose ol {
+  margin: 0;
+  padding-left: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+.prose li { line-height: 1.6; }
+.prose a {
+  color: var(--coral-deep);
+  border-bottom: 1.5px solid transparent;
+  transition: border-color 0.16s;
+}
+.prose a:hover { border-color: var(--coral-deep); }
+.prose strong { color: var(--ink); }
+.prose blockquote {
+  border-left: 3px solid var(--coral);
+  padding: 4px 0 4px 18px;
+  margin: 6px 0;
+  color: var(--ink-mute);
+  font-style: italic;
+}
+.prose blockquote p { margin: 0; }
+.prose hr { border: none; border-top: 1px solid var(--rule); margin: 10px 0; }
+
+/* Immagini nel corpo: arrotondate come le card, mai oltre la colonna */
+.prose img {
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--r-3);
+  border: 1px solid var(--rule-soft);
+}
+
+/* Codice inline (es. percentuali di etichetta, dosi): pill discreta */
+.prose code {
+  font-family: var(--mono);
+  font-size: 0.88em;
+  background: rgba(28, 79, 83, 0.08);
+  border-radius: 4px;
+  padding: 2px 6px;
+}
+
+/* Tabelle Markdown (confronti umido/crocchette, dosi…): leggibili e
+   scrollabili in orizzontale sugli schermi stretti */
+.prose table {
+  display: block;
+  overflow-x: auto;
+  border-collapse: collapse;
+  font-size: 15px;
+  line-height: 1.5;
+}
+.prose th,
+.prose td {
+  border: 1px solid var(--rule);
+  padding: 10px 14px;
+  text-align: left;
+  vertical-align: top;
+  min-width: 120px;
+}
+.prose th {
+  background: var(--aqua-mist);
+  color: var(--petrol-darkest);
+  font-weight: 600;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.prose tbody tr:nth-child(even) td { background: var(--bg-paper); }
+
+/* ── Stampa: gli articoli sono guide che finiscono sul frigo ─────
+   Via il "guscio" interattivo, testo nero su bianco, niente sfondi. */
+@media print {
+  .site-header,
+  .site-footer,
+  .to-top,
+  .read-progress,
+  .share-row,
+  .call-modal,
+  .skip-link,
+  .cta-band,
+  section:has(.cta-band),
+  section:has(.card-grid) {
+    display: none !important;
+  }
+  body.brand,
+  .paper-bg {
+    background: #fff !important;
+  }
+  .section::before, .section-tight::before,
+  .section::after, .section-tight::after {
+    display: none !important;
+  }
+  .prose,
+  .brand p {
+    color: #000;
+  }
+  .prose a {
+    color: #000;
+    border-bottom: none;
+    text-decoration: underline;
+  }
+  /* I link esterni stampano l'indirizzo: sulla carta non si clicca */
+  .prose a[href^='http']::after {
+    content: ' (' attr(href) ')';
+    font-size: 0.8em;
+    color: #444;
+    word-break: break-all;
+  }
+}

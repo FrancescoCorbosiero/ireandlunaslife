@@ -1,0 +1,265 @@
+/* Ire & Luna's Life — Brand System "Bacheca"
+
+   La bacheca di Irene e Luna: foto vere scontornate come sticker, polaroid
+   con le didascalie a mano, nastri che scorrono, etichette un po' storte.
+   I colori vengono dal vecchio sito e dal logo (la macchia teal dietro la
+   scritta, il corallo, il giallo dei bottoni, il lilla delle card), ma
+   portati a pieno colore e affiancati a un inchiostro caldo:
+
+   · neutri: un latte appena rosato come fondo, petrolio notte per footer e
+     bande scure, inchiostro bruno-nero per bordi e testo;
+   · tipografia: Nunito (tondo, amichevole, leggibile anche lungo) per testo
+     e titoli piccoli; Lilita One per i titoli grandi e i nastri, la voce
+     allegra che sul vecchio sito era Coiny; Pacifico, il corsivo del logo,
+     per le note scritte a mano;
+   · forme: sticker, bordi da 2px, ombre piene "a timbro", rotazioni
+     leggere. Niente texture finte: colore pieno e foto vere.
+*/
+
+:root {
+  /* ── PALETTE ─────────────────────────────────────────── */
+  --bg-milk:         #fff5ec;   /* fondo pagina: latte caldo, appena rosato */
+  --apricot:         #ffe1cc;   /* superfici calde, fasce chiare con più corpo */
+  --bg-paper:        #ffffff;   /* superfici, card, sticker */
+  --bg-night:        #0f2b2d;   /* petrolio notte: bande scure, footer */
+
+  --teal:            #2f9c9a;   /* TEAL PRIMARIO — la macchia del logo, più piena */
+  --aqua-soft:       #8fd3cd;
+  --aqua-mist:       #d3f1ec;
+  --petrol:          #1c4f53;
+  --petrol-darkest:  #0a1d1f;
+  --lagoon:          #145a5c;   /* laguna: hero della home */
+
+  /* Prugna e lilla: il calore scuro accanto al teal (la card "Educazione"). */
+  --plum:            #4a2747;   /* prugna piena: fasce scure calde */
+  --plum-deep:       #301830;
+  --plum-soft:       #c9a8ec;   /* lilla */
+
+  --coral:           #ff7d68;   /* CORALLO — CTA, sticker, evidenze */
+  --coral-soft:      #ffc6b8;
+  --coral-deep:      #db4734;   /* testo/accenti grandi su chiaro */
+  --sun:             #ffc43d;   /* giallo sole: timbri, accenti, Team Branco */
+
+  --ink:             #211a1c;
+  --ink-soft:        #4a3f42;
+  --ink-mute:        #7a6c70;
+  --milk-ink:        #fff5ec;   /* testo chiaro su scuro */
+
+  --rule:            rgba(33, 26, 28, 0.16);
+  --rule-soft:       rgba(33, 26, 28, 0.08);
+  --rule-milk:       rgba(255, 245, 236, 0.22);
+
+  /* Ombre "a timbro": piene, senza sfocatura, come uno sticker sollevato. */
+  --line:            2px solid var(--ink);
+  --shadow-s:        3px 3px 0 var(--ink);
+  --shadow-m:        5px 5px 0 var(--ink);
+  --shadow-l:        8px 8px 0 var(--ink);
+
+  /* ── TIPOGRAFIA ──────────────────────────────────────── */
+  --display: var(--font-nunito, 'Nunito', 'Arial Rounded MT Bold', sans-serif);
+  --sans:    var(--font-nunito, 'Nunito', -apple-system, system-ui, sans-serif);
+  --poster:  var(--font-lilita, 'Lilita One', 'Arial Black', sans-serif);
+  --script:  var(--font-pacifico, 'Pacifico', 'Brush Script MT', cursive);
+  /* Alias storici: niente serif né monospace. */
+  --serif:   var(--sans);
+  --mono:    var(--sans);
+
+  /* ── FORME ───────────────────────────────────────────── */
+  --r-1: 6px;
+  --r-2: 14px;
+  --r-3: 26px;
+  --r-pill: 999px;
+}
+
+.brand {
+  font-family: var(--sans);
+  color: var(--ink);
+  background: var(--bg-milk);
+  -webkit-font-smoothing: antialiased;
+  font-optical-sizing: auto;
+  /* Lilita One e Pacifico hanno un peso solo: niente grassetti finti. */
+  font-synthesis-weight: none;
+}
+
+/* DISPLAY — nero, stretto, in minuscolo: si legge come una frase detta. */
+.brand h1, .brand h2, .brand h3, .brand .display {
+  font-family: var(--display);
+  font-weight: 900;
+  text-transform: none;
+  letter-spacing: -0.025em;
+  line-height: 0.94;
+  text-wrap: balance;
+}
+.brand h3 { letter-spacing: -0.02em; line-height: 1.02; }
+
+/* Etichetta = sticker: pillola bordata, leggermente storta, ombra piena. */
+.brand .eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+  font-family: var(--sans);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--ink);
+  background: var(--bg-paper);
+  border: var(--line);
+  border-radius: var(--r-pill);
+  padding: 7px 14px 8px;
+  box-shadow: var(--shadow-s);
+  transform: rotate(-2deg);
+}
+
+.brand .lead {
+  font-family: var(--sans);
+  font-size: 19px;
+  line-height: 1.45;
+  font-weight: 400;
+  color: var(--ink-soft);
+  text-wrap: pretty;
+}
+
+.brand .script {
+  font-family: var(--script);
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+/* Colore pieno: le vecchie texture carta sono state ritirate. */
+.paper-bg { background-color: var(--bg-milk); }
+.paper-bg-deep { background-color: var(--bg-night); }
+
+/* Placeholder per immagini mancanti */
+.placeholder {
+  background:
+    repeating-linear-gradient(135deg, rgba(47, 156, 154, 0.22) 0 10px, rgba(47, 156, 154, 0.08) 10px 20px),
+    var(--aqua-mist);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--petrol);
+}
+
+/* Bottoni — sticker premibili: bordo d'inchiostro, ombra piena che si
+   allunga al passaggio e sparisce alla pressione. */
+.brand .btn {
+  --btn-shadow: var(--ink);
+  font-family: var(--sans);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.005em;
+  line-height: 1.1;
+  padding: 14px 24px;
+  border: var(--line);
+  background: var(--coral);
+  color: var(--ink);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  border-radius: var(--r-pill);
+  box-shadow: 4px 4px 0 var(--btn-shadow);
+  transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.25s cubic-bezier(0.2, 0.8, 0.2, 1),
+    background-color 0.25s ease, color 0.25s ease;
+}
+.brand .btn:hover {
+  background: var(--coral);
+  color: var(--ink);
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0 var(--btn-shadow);
+}
+.brand .btn:active {
+  transform: translate(3px, 3px);
+  box-shadow: 0 0 0 var(--btn-shadow);
+}
+.brand .btn-dark { background: var(--petrol); color: var(--milk-ink); }
+.brand .btn-dark:hover { background: var(--ink); color: var(--milk-ink); }
+.brand .btn-ghost { background: var(--bg-paper); color: var(--ink); border: var(--line); }
+.brand .btn-ghost:hover { background: var(--aqua-mist); color: var(--ink); }
+
+/* Pill / tag */
+.brand .pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 13px;
+  border-radius: var(--r-pill);
+  background: var(--aqua-mist);
+  color: var(--ink);
+  border: 1.5px solid var(--ink);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+.brand .pill-coral { background: var(--coral); color: var(--ink); }
+.brand .pill-dark { background: var(--ink); color: var(--milk-ink); }
+
+/* Form — campi morbidi, bordo che diventa inchiostro al focus */
+.brand .field {
+  display: block;
+  margin-bottom: 16px;
+}
+.brand .field label {
+  font-size: 14px;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--ink);
+  font-weight: 700;
+  display: block;
+  margin-bottom: 7px;
+}
+.brand input, .brand textarea, .brand select {
+  font-family: var(--sans);
+  font-size: 16px;
+  background: var(--bg-milk);
+  border: 2px solid var(--rule);
+  border-radius: var(--r-2);
+  padding: 13px 15px;
+  width: 100%;
+  color: var(--ink);
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+  box-sizing: border-box;
+}
+.brand input:focus, .brand textarea:focus, .brand select:focus {
+  border-color: var(--ink);
+  background: var(--bg-paper);
+  box-shadow: 3px 3px 0 var(--coral);
+}
+
+/* ── TITOLI "IMPACT" (Lilita One maiuscolo) ───────────────────────────
+   Tondo, pesante, tutto maiuscolo: la voce dei manifesti e delle cover
+   social, ma allegra. Solo sui titoli grandi; h3, FAQ e frase grande
+   restano in Nunito per leggerli bene. Le parole a mano (Pacifico) fanno da
+   contrasto: Pacifico è largo e alto, quindi dentro i titoli scende di
+   corpo e si appoggia sulla riga. */
+.type-impact { --display-impact: var(--poster); }
+.type-impact :is(h1, h2, .display, .hm-title, .c-title, .l-title, .a-title, .cs-title, .h-cta-title, .a-cta-title,
+  .cs-cta-title, .l-strike-title, .foot-wordmark) {
+  font-family: var(--display-impact);
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  line-height: 0.94;
+}
+.type-impact :is(.hm-title, .c-title, .l-title, .a-title, .cs-title, .h-cta-title, .a-cta-title, .cs-cta-title) { line-height: 0.92; }
+.type-impact .statement { font-family: var(--sans); font-weight: 900; text-transform: none; letter-spacing: -0.03em; line-height: 1.02; }
+.type-impact :is(h1, h2) .script { text-transform: none; font-size: 0.66em; font-weight: 400; letter-spacing: 0; line-height: 1; }
+.type-impact .foot-wordmark { letter-spacing: 0.01em; }
+.type-impact .lockup-name, .type-impact .footer-lockup .n { font-family: var(--poster); font-weight: 400; text-transform: uppercase; letter-spacing: 0.03em; }
+
+/* ── TITOLI "ROUNDED" (Nunito nero, minuscolo) ─────────────────────────
+   Alternativa più quieta: stesso Nunito del testo, a peso 900. */
+.type-rounded :is(h1, h2, .display, .hm-title, .c-title, .h-cta-title, .cs-title, .foot-wordmark) {
+  font-family: var(--display);
+  font-weight: 900;
+  letter-spacing: -0.035em;
+}
+.type-rounded :is(h1, h2) .script { font-size: 0.74em; font-weight: 400; letter-spacing: 0; }

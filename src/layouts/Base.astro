@@ -1,0 +1,159 @@
+---
+import '../styles/brand.css';
+import '../styles/site.css';
+import '../styles/effects.css';
+import '../styles/motion.css';
+import '../styles/sections.css';
+import { Font } from 'astro:assets';
+import { ClientRouter } from 'astro:transitions';
+import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import CallModal from '../components/CallModal.astro';
+import { SITE, SITE_NAME, TYPE_STYLE, HAS_WA, CAL_LINK } from '../config';
+import {
+  siteGraph,
+  breadcrumbLd,
+  absoluteUrl,
+  DEFAULT_OG_IMAGE,
+  LOCALE,
+  DEFAULT_ROBOTS,
+  THEME_COLOR,
+  TWITTER_HANDLE,
+  GOOGLE_SITE_VERIFICATION,
+} from '../lib/seo';
+
+interface Props {
+  title: string;
+  description: string;
+  ogTitle?: string;
+  ogDescription?: string;
+  ogImage?: string;
+  ogImageAlt?: string;
+  /** Dimensioni reali dell'immagine social: aiutano gli scraper a renderizzare subito la card. */
+  ogImageWidth?: number;
+  ogImageHeight?: number;
+  ogImageType?: string;
+  ogType?: string;
+  active?: string;
+  robots?: string;
+  /** Breadcrumb per le pagine di dettaglio: [{ name, url }]. */
+  breadcrumbs?: { name: string; url: string }[];
+  /** Structured data aggiuntivi (Article, Event, ItemList…). */
+  jsonLd?: Record<string, unknown> | Record<string, unknown>[];
+}
+
+const {
+  title,
+  description,
+  ogTitle = title,
+  ogDescription = description,
+  ogImage = DEFAULT_OG_IMAGE,
+  ogImageAlt = "Irene e Luna, la sua Australian Cattle Dog, sdraiate insieme",
+  ogImageWidth,
+  ogImageHeight,
+  ogImageType = 'image/jpeg',
+  ogType = 'website',
+  active,
+  robots = DEFAULT_ROBOTS,
+  breadcrumbs,
+  jsonLd,
+} = Astro.props;
+
+const canonical = new URL(Astro.url.pathname, SITE).href;
+const ogImageAbs = absoluteUrl(ogImage);
+
+const extra = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
+const structuredData = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    ...siteGraph(),
+    ...(breadcrumbs?.length ? [breadcrumbLd(breadcrumbs)] : []),
+    ...extra,
+  ],
+};
+
+// Speculation Rules API: prefetch dei documenti interni (warm-up del navigatore).
+const speculationRules = JSON.stringify({
+  prefetch: [{ source: 'document', where: { href_matches: '/*' }, eagerness: 'moderate' }],
+});
+---
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="robots" content={robots} />
+    <link rel="canonical" href={canonical} />
+    <!-- Favicon vere (generate da scripts/optimize-assets.mjs, `npm run assets`) -->
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16.png" />
+    <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="sitemap" type="application/xml" href="/sitemap-index.xml" />
+    <meta name="theme-color" content={THEME_COLOR} />
+    <meta name="generator" content={Astro.generator} />
+    {GOOGLE_SITE_VERIFICATION && <meta name="google-site-verification" content={GOOGLE_SITE_VERIFICATION} />}
+
+    <!-- Open Graph -->
+    <meta property="og:type" content={ogType} />
+    <meta property="og:title" content={ogTitle} />
+    <meta property="og:description" content={ogDescription} />
+    <meta property="og:image" content={ogImageAbs} />
+    <meta property="og:image:secure_url" content={ogImageAbs} />
+    <meta property="og:image:type" content={ogImageType} />
+    {ogImageWidth && <meta property="og:image:width" content={String(ogImageWidth)} />}
+    {ogImageHeight && <meta property="og:image:height" content={String(ogImageHeight)} />}
+    <meta property="og:image:alt" content={ogImageAlt} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:locale" content={LOCALE} />
+    <meta property="og:site_name" content={SITE_NAME} />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={ogTitle} />
+    <meta name="twitter:description" content={ogDescription} />
+    <meta name="twitter:image" content={ogImageAbs} />
+    <meta name="twitter:image:alt" content={ogImageAlt} />
+    {TWITTER_HANDLE && <meta name="twitter:site" content={TWITTER_HANDLE} />}
+
+    <!-- Font self-hosted (Fonts API, vedi astro.config.mjs): zero richieste a Google.
+         Preload solo di Nunito (testo, un solo file variabile); Lilita One
+         (titoli, nastri) e Pacifico (note a mano) arrivano subito dopo. -->
+    <Font cssVariable="--font-nunito" preload />
+    <Font cssVariable="--font-lilita" preload={TYPE_STYLE === 'impact'} />
+    <Font cssVariable="--font-pacifico" />
+
+    <script type="application/ld+json" is:inline set:html={JSON.stringify(structuredData)} />
+    <script type="speculationrules" is:inline set:html={speculationRules} />
+
+    <link rel="alternate" type="application/rss+xml" title={SITE_NAME} href="/rss.xml" />
+
+    <ClientRouter />
+    <slot name="head" />
+  </head>
+  <body class:list={['brand paper-bg', `type-${TYPE_STYLE}`]}>
+    <a class="skip-link" href="#contenuto">Salta al contenuto</a>
+    <SiteHeader active={active} />
+    <main id="contenuto">
+      <slot />
+    </main>
+    <SiteFooter />
+    {/* Il modale "scegli uno slot" conferma su WhatsApp: senza numero non serve. */}
+    {HAS_WA && CAL_LINK === '' && <CallModal />}
+    <button class="to-top" data-to-top type="button" aria-label="Torna all'inizio della pagina">
+      <svg class="to-top-ring" viewBox="0 0 36 36" aria-hidden="true">
+        <circle class="ring-bg" cx="18" cy="18" r="16"></circle>
+        <circle class="ring-fg" cx="18" cy="18" r="16" transform="rotate(-90 18 18)" data-ring></circle>
+      </svg>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M12 19V5m0 0-6 6m6-6 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+      </svg>
+    </button>
+    <script>
+      import '../scripts/site.ts';
+    </script>
+  </body>
+</html>
