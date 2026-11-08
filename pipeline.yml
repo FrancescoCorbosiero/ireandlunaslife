@@ -1,0 +1,10 @@
+build: "npm ci && npm run build"
+output_dir: "dist"
+editable_paths:
+  - "src/content/articoli"
+  - "src/pages"
+  - "src/components"
+  - "src/layouts"
+  - "src/styles"
+  - "src/assets"
+  - "public/assets"
